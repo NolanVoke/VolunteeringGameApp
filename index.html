@@ -1,2 +1,277 @@
-<!-- Hello -->
-<p>Sum text herer</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VolunteeringGameApp - Gamify Your Community Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #001b2e;
+            background-color: #eef3f9;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: #001b2e;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #b3cde4;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #b3cde4;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #eef3f9;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1d3f58 0%, #537692 100%);
+            color: #eef3f9;
+            padding: 4rem 2rem;
+            text-align: center;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 2rem;
+            color: #b3cde4;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #537692;
+            color: #eef3f9;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d3f58;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #b3cde4;
+            color: #001b2e;
+        }
+
+        .btn-secondary:hover {
+            background-color: #eef3f9;
+            transform: translateY(-2px);
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 27, 46, 0.1);
+            border-top: 4px solid #537692;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 27, 46, 0.15);
+        }
+
+        .feature-card h2 {
+            color: #001b2e;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: #1d3f58;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Call to Action */
+        .cta-section {
+            background-color: #b3cde4;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .cta-section h2 {
+            color: #001b2e;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .cta-section p {
+            color: #1d3f58;
+            margin-bottom: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #001b2e;
+            color: #b3cde4;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        footer a {
+            color: #b3cde4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #eef3f9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">🎮 VolunteeringGameApp</div>
+        <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Make a Difference While Having Fun</h1>
+        <p>Transform community service into an engaging game. Earn points, complete challenges, and build a better community—all while having a blast!</p>
+        <div class="cta-buttons">
+            <button class="btn btn-primary">Get Started</button>
+            <button class="btn btn-secondary">Learn More</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h2>Gamified Volunteering</h2>
+            <p>Participate in community service activities and earn rewards. Complete challenges, unlock achievements, and compete on leaderboards with friends and community members.</p>
+            <a href="#" class="btn btn-primary">Explore Opportunities</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h2>Civic Engagement</h2>
+            <p>Make meaningful contributions to your community. Find local causes, connect with like-minded volunteers, and create real impact in the areas you care about.</p>
+            <a href="#" class="btn btn-primary">Browse Causes</a>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="cta-section" id="about">
+        <h2>Ready to Join the Movement?</h2>
+        <p>Start your journey today and become part of a community that's making real change. Volunteering has never been more engaging or rewarding.</p>
+        <button class="btn btn-secondary">Sign Up Now</button>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <p></p>
+        <p>
+            <a href="#">Privacy Policy</a> | 
+            <a href="#">Terms of Service</a> | 
+            <a href="#">Contact Us</a>
+        </p>
+    </footer>
+</body>
+</html>
