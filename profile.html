@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f6f5ef">
+    <title>My Profile | GoodTurn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html" aria-label="GoodTurn opportunities">
+            <span class="brand-mark" aria-hidden="true">g</span>
+            <span>goodturn</span>
+        </a>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a class="nav-link" href="index.html">Opportunities</a>
+            <a class="nav-link" href="leaderboard.html">Leaderboards</a>
+            <a class="nav-link profile-link active" href="profile.html" aria-current="page">
+                <span class="avatar avatar-small" aria-hidden="true">JD</span>
+                <span>My profile</span>
+            </a>
+        </nav>
+        <span class="location-label"><span aria-hidden="true">⌖</span> Brooklyn, NY</span>
+    </header>
+
+    <main class="page-main content-width profile-page">
+        <div class="page-heading-row profile-heading">
+            <div>
+                <p class="section-kicker">YOUR GOOD-TURN STREAK</p>
+                <h1 class="page-title">My profile<span class="heading-period">.</span></h1>
+                <p class="page-description">Every hour you give helps your neighborhood thrive.</p>
+            </div>
+            <span class="member-since">MEMBER SINCE 2025</span>
+        </div>
+
+        <section class="profile-level-card" aria-labelledby="member-name">
+            <div class="member-identity">
+                <span class="avatar avatar-giant avatar-peach" aria-hidden="true">JD</span>
+                <div>
+                    <p class="section-kicker">BROOKLYN, NEW YORK</p>
+                    <h2 id="member-name">Jordan Davis</h2>
+                    <p class="member-tagline">Making good happen, one day at a time.</p>
+                </div>
+            </div>
+            <div class="level-divider"></div>
+            <div class="level-progress">
+                <div class="level-label-row"><span class="level-badge">LEVEL 7</span><span class="level-name">Community Champion</span></div>
+                <div class="xp-numbers"><strong>2,480 <span>XP</span></strong><span>3,000 XP to next level</span></div>
+                <div class="xp-track" role="progressbar" aria-label="Experience toward level 8" aria-valuemin="0" aria-valuemax="3000" aria-valuenow="2480">
+                    <span class="xp-fill"></span>
+                </div>
+                <p class="xp-caption">520 XP to Level 8 <span aria-hidden="true">✳</span></p>
+            </div>
+        </section>
+
+        <section class="profile-stats-grid" aria-label="Your volunteering totals">
+            <article class="stat-card"><span class="stat-icon stat-icon-green" aria-hidden="true">◷</span><strong>8.5</strong><span>HOURS GIVEN</span></article>
+            <article class="stat-card"><span class="stat-icon stat-icon-coral" aria-hidden="true">✳</span><strong>4</strong><span>GOOD TURNS</span></article>
+            <article class="stat-card"><span class="stat-icon stat-icon-yellow" aria-hidden="true">⌖</span><strong>3</strong><span>CAUSES HELPED</span></article>
+        </section>
+
+        <section class="profile-lower-grid">
+            <section class="profile-content-panel" aria-labelledby="recent-title">
+                <div class="profile-panel-heading"><div><p class="section-kicker">YOUR COMMUNITY IMPACT</p><h2 id="recent-title">Recent good turns</h2></div><a href="index.html" class="text-link">Find more <span aria-hidden="true">↗</span></a></div>
+                <ul class="activity-list">
+                    <li><span class="activity-mark activity-mark-green" aria-hidden="true">✳</span><div><strong>Planted native flowers</strong><span>Fort Greene Park · Oct 12</span></div><span class="activity-xp">+75 XP</span></li>
+                    <li><span class="activity-mark activity-mark-coral" aria-hidden="true">♡</span><div><strong>Sorted pantry donations</strong><span>Brooklyn Community Fridge · Oct 05</span></div><span class="activity-xp">+60 XP</span></li>
+                    <li><span class="activity-mark activity-mark-yellow" aria-hidden="true">▤</span><div><strong>Read with young learners</strong><span>Williamsburg Library · Sep 28</span></div><span class="activity-xp">+50 XP</span></li>
+                </ul>
+            </section>
+            <section class="profile-content-panel badges-panel" aria-labelledby="badges-title">
+                <div class="profile-panel-heading"><div><p class="section-kicker">MILESTONES UNLOCKED</p><h2 id="badges-title">Your badges</h2></div></div>
+                <div class="badge-list">
+                    <div class="achievement-badge"><span class="badge-icon badge-icon-green" aria-hidden="true">✿</span><span><strong>Green Thumb</strong><small>Helped a local park bloom</small></span></div>
+                    <div class="achievement-badge"><span class="badge-icon badge-icon-coral" aria-hidden="true">♡</span><span><strong>Good Neighbor</strong><small>Supported your community</small></span></div>
+                    <div class="achievement-badge"><span class="badge-icon badge-icon-yellow" aria-hidden="true">✦</span><span><strong>First Steps</strong><small>Completed your first good turn</small></span></div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <footer class="app-footer"><span>goodturn <span aria-hidden="true">✳</span> make good happen</span><span>Made for the place we call home.</span></footer>
+</body>
+</html>
