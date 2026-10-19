@@ -17,9 +17,9 @@
             <span>goodturn</span>
         </a>
         <nav class="main-nav" aria-label="Main navigation">
-            <a class="nav-link active" href="#opportunities" aria-current="page">Opportunities</a>
-            <a class="nav-link" href="#leaderboards">Leaderboards</a>
-            <a class="nav-link profile-link" href="#profile">
+            <a class="nav-link active" href="index.html" aria-current="page">Opportunities</a>
+            <a class="nav-link" href="leaderboard.html">Leaderboards</a>
+            <a class="nav-link profile-link" href="profile.html">
                 <span class="avatar avatar-small" aria-hidden="true">JD</span>
                 <span>My profile</span>
             </a>
@@ -87,41 +87,10 @@
             </div>
         </section>
 
-        <section class="community-sections content-width" aria-label="Your community and profile">
-            <section class="leaderboard-panel" id="leaderboards" aria-labelledby="leaderboard-title">
-                <div class="panel-heading"><div><p class="section-kicker">GOOD TURNS ADD UP</p><h2 id="leaderboard-title">Neighborhood leaderboard</h2></div><span class="period-label">THIS MONTH</span></div>
-                <ol class="leaderboard-list">
-                    <li><span class="rank">01</span><span class="avatar avatar-mint">MC</span><span class="volunteer-name">Maya Chen</span><span class="score">420 <small>pts</small></span></li>
-                    <li class="current-user"><span class="rank">02</span><span class="avatar avatar-peach">JD</span><span class="volunteer-name">You <small>· Brooklyn</small></span><span class="score">385 <small>pts</small></span></li>
-                    <li><span class="rank">03</span><span class="avatar avatar-blue">AR</span><span class="volunteer-name">Alex Rivera</span><span class="score">340 <small>pts</small></span></li>
-                </ol>
-            </section>
-            <section class="profile-panel" id="profile" aria-labelledby="profile-title">
-                <p class="section-kicker">YOUR GOOD-TURN STREAK</p>
-                <div class="profile-summary"><span class="avatar avatar-large avatar-peach">JD</span><div><h2 id="profile-title">Hey, Jordan.</h2><p>Showing up makes a difference.</p></div></div>
-                <div class="profile-stats"><div><strong>385</strong><span>POINTS EARNED</span></div><div><strong>8</strong><span>HOURS GIVEN</span></div><div><strong>4</strong><span>GOOD TURNS</span></div></div>
-            </section>
-        </section>
     </main>
 
     <footer class="app-footer"><span>goodturn <span aria-hidden="true">✳</span> make good happen</span><span>Made for the place we call home.</span></footer>
     <script>
-        const navLinks = document.querySelectorAll('.nav-link');
-        const updateActiveNav = () => {
-            navLinks.forEach((link) => {
-                const isCurrent = link.hash === (window.location.hash || '#opportunities');
-                link.classList.toggle('active', isCurrent);
-                if (isCurrent) {
-                    link.setAttribute('aria-current', 'page');
-                } else {
-                    link.removeAttribute('aria-current');
-                }
-            });
-        };
-
-        window.addEventListener('hashchange', updateActiveNav);
-        updateActiveNav();
-
         document.querySelectorAll('.signup-button').forEach((button) => {
             button.addEventListener('click', () => {
                 button.textContent = 'You’re signed up ✓';
