@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f6f5ef">
-    <title>My Profile | GoodTurn</title>
+    <title>Volunteer Profile | Local Volunteering</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -12,77 +12,106 @@
 </head>
 <body>
     <header class="topbar">
-        <a class="brand" href="index.html" aria-label="GoodTurn opportunities">
-            <span class="brand-mark" aria-hidden="true">g</span>
-            <span>goodturn</span>
+        <a class="brand" href="index.html" aria-label="Local Volunteering opportunities">
+            <span class="brand-mark" aria-hidden="true">L</span>
+            <span>Local Volunteering</span>
         </a>
         <nav class="main-nav" aria-label="Main navigation">
             <a class="nav-link" href="index.html">Opportunities</a>
-            <a class="nav-link" href="leaderboard.html">Leaderboards</a>
+            <a class="nav-link" href="leaderboard.html">Community</a>
             <a class="nav-link profile-link active" href="profile.html" aria-current="page">
-                <span class="avatar avatar-small" aria-hidden="true">JD</span>
+                <span class="avatar avatar-small" data-profile-initials aria-hidden="true">?</span>
                 <span>My profile</span>
             </a>
         </nav>
-        <span class="location-label"><span aria-hidden="true">⌖</span> Brooklyn, NY</span>
+        <button class="location-button" id="location-button" type="button" aria-haspopup="dialog">
+            <span aria-hidden="true">⌖</span> <span data-location-label>Brooklyn, NY</span> <span class="chevron" aria-hidden="true">⌄</span>
+        </button>
     </header>
 
     <main class="page-main content-width profile-page">
-        <div class="page-heading-row profile-heading">
+        <div class="page-heading-row">
             <div>
-                <p class="section-kicker">YOUR GOOD-TURN STREAK</p>
-                <h1 class="page-title">My profile<span class="heading-period">.</span></h1>
-                <p class="page-description">Every hour you give helps your neighborhood thrive.</p>
+                <p class="section-kicker">YOUR ACCOUNT</p>
+                <h1 class="page-title">Volunteer profile<span class="heading-period">.</span></h1>
+                <p class="page-description">Create a profile and keep a personal record of your volunteer work.</p>
             </div>
-            <span class="member-since">MEMBER SINCE 2025</span>
         </div>
 
-        <section class="profile-level-card" aria-labelledby="member-name">
-            <div class="member-identity">
-                <span class="avatar avatar-giant avatar-peach" aria-hidden="true">JD</span>
-                <div>
-                    <p class="section-kicker">BROOKLYN, NEW YORK</p>
-                    <h2 id="member-name">Jordan Davis</h2>
-                    <p class="member-tagline">Making good happen, one day at a time.</p>
-                </div>
+        <section class="profile-overview" aria-labelledby="profile-name">
+            <span class="avatar avatar-giant avatar-peach" data-profile-initials aria-hidden="true">?</span>
+            <div class="profile-overview-details">
+                <h2 id="profile-name">No profile yet</h2>
+                <p id="profile-email">Create a profile on this browser</p>
             </div>
-            <div class="level-divider"></div>
-            <div class="level-progress">
-                <div class="level-label-row"><span class="level-badge">LEVEL 7</span><span class="level-name">Community Champion</span></div>
-                <div class="xp-numbers"><strong>2,480 <span>XP</span></strong><span>3,000 XP to next level</span></div>
-                <div class="xp-track" role="progressbar" aria-label="Experience toward level 8" aria-valuemin="0" aria-valuemax="3000" aria-valuenow="2480">
-                    <span class="xp-fill"></span>
-                </div>
-                <p class="xp-caption">520 XP to Level 8 <span aria-hidden="true">✳</span></p>
+            <div class="profile-stats-grid" aria-label="Your recorded volunteer activity">
+                <article class="stat-card"><strong><span id="hours-total">0</span></strong><span>HOURS RECORDED</span></article>
+                <article class="stat-card"><strong><span id="activity-total">0</span></strong><span>ACTIVITIES</span></article>
             </div>
         </section>
 
-        <section class="profile-stats-grid" aria-label="Your volunteering totals">
-            <article class="stat-card"><span class="stat-icon stat-icon-green" aria-hidden="true">◷</span><strong>8.5</strong><span>HOURS GIVEN</span></article>
-            <article class="stat-card"><span class="stat-icon stat-icon-coral" aria-hidden="true">✳</span><strong>4</strong><span>GOOD TURNS</span></article>
-            <article class="stat-card"><span class="stat-icon stat-icon-yellow" aria-hidden="true">⌖</span><strong>3</strong><span>CAUSES HELPED</span></article>
-        </section>
-
-        <section class="profile-lower-grid">
-            <section class="profile-content-panel" aria-labelledby="recent-title">
-                <div class="profile-panel-heading"><div><p class="section-kicker">YOUR COMMUNITY IMPACT</p><h2 id="recent-title">Recent good turns</h2></div><a href="index.html" class="text-link">Find more <span aria-hidden="true">↗</span></a></div>
-                <ul class="activity-list">
-                    <li><span class="activity-mark activity-mark-green" aria-hidden="true">✳</span><div><strong>Planted native flowers</strong><span>Fort Greene Park · Oct 12</span></div><span class="activity-xp">+75 XP</span></li>
-                    <li><span class="activity-mark activity-mark-coral" aria-hidden="true">♡</span><div><strong>Sorted pantry donations</strong><span>Brooklyn Community Fridge · Oct 05</span></div><span class="activity-xp">+60 XP</span></li>
-                    <li><span class="activity-mark activity-mark-yellow" aria-hidden="true">▤</span><div><strong>Read with young learners</strong><span>Williamsburg Library · Sep 28</span></div><span class="activity-xp">+50 XP</span></li>
-                </ul>
-            </section>
-            <section class="profile-content-panel badges-panel" aria-labelledby="badges-title">
-                <div class="profile-panel-heading"><div><p class="section-kicker">MILESTONES UNLOCKED</p><h2 id="badges-title">Your badges</h2></div></div>
-                <div class="badge-list">
-                    <div class="achievement-badge"><span class="badge-icon badge-icon-green" aria-hidden="true">✿</span><span><strong>Green Thumb</strong><small>Helped a local park bloom</small></span></div>
-                    <div class="achievement-badge"><span class="badge-icon badge-icon-coral" aria-hidden="true">♡</span><span><strong>Good Neighbor</strong><small>Supported your community</small></span></div>
-                    <div class="achievement-badge"><span class="badge-icon badge-icon-yellow" aria-hidden="true">✦</span><span><strong>First Steps</strong><small>Completed your first good turn</small></span></div>
+        <div class="profile-workspace">
+            <section class="profile-content-panel" aria-labelledby="profile-form-title">
+                <div class="profile-panel-heading">
+                    <div><p class="section-kicker">PROFILE DETAILS</p><h2 id="profile-form-title">Your profile</h2></div>
                 </div>
+                <form id="profile-form" class="form-stack">
+                    <label for="profile-name-input">Name</label>
+                    <input id="profile-name-input" name="name" type="text" autocomplete="name" maxlength="80" required>
+                    <label for="profile-email-input">Email</label>
+                    <input id="profile-email-input" name="email" type="email" autocomplete="email" maxlength="254" required>
+                    <button class="location-submit form-submit" type="submit">Save profile</button>
+                    <p class="form-note">Saved only in this browser. This demo does not provide Google sign-in or a shared account.</p>
+                    <p class="form-status" id="profile-status" role="status" aria-live="polite"></p>
+                </form>
             </section>
+
+            <section class="profile-content-panel" aria-labelledby="activity-form-title">
+                <div class="profile-panel-heading">
+                    <div><p class="section-kicker">VOLUNTEER RECORD</p><h2 id="activity-form-title">Record an activity</h2></div>
+                </div>
+                <form id="activity-form" class="form-stack">
+                    <fieldset id="activity-fields" disabled>
+                        <label for="activity-title">Activity</label>
+                        <input id="activity-title" name="title" type="text" maxlength="100" required>
+                        <label for="activity-organization">Organization or location</label>
+                        <input id="activity-organization" name="organization" type="text" maxlength="100">
+                        <div class="form-inline-fields">
+                            <div><label for="activity-hours">Hours</label><input id="activity-hours" name="hours" type="number" min="0.1" max="24" step="0.1" required></div>
+                            <div><label for="activity-date">Date</label><input id="activity-date" name="date" type="date" required></div>
+                        </div>
+                        <label for="activity-notes">Notes <span class="optional-label">Optional</span></label>
+                        <textarea id="activity-notes" name="notes" rows="3" maxlength="400"></textarea>
+                        <button class="location-submit form-submit" type="submit">Save activity</button>
+                    </fieldset>
+                    <p class="form-note">Personal records only; hours are not verified or redeemable through this demo.</p>
+                    <p class="form-status" id="activity-status" role="status" aria-live="polite">Create a profile before recording volunteer work.</p>
+                </form>
+            </section>
+        </div>
+
+        <section class="profile-content-panel activity-history" aria-labelledby="activity-list-title">
+            <div class="profile-panel-heading">
+                <div><p class="section-kicker">YOUR SAVED RECORDS</p><h2 id="activity-list-title">Volunteer activity</h2></div>
+                <span class="results-count" id="activity-count-label">0 activities</span>
+            </div>
+            <ul class="activity-list" id="activity-list" aria-live="polite"></ul>
         </section>
     </main>
 
-    <footer class="app-footer"><span>goodturn <span aria-hidden="true">✳</span> make good happen</span><span>Made for the place we call home.</span></footer>
+    <footer class="app-footer"><span>Local Volunteering</span><span>Opportunities and personal records for your community.</span></footer>
+
+    <dialog class="location-dialog" id="location-dialog" aria-labelledby="location-title">
+        <form method="dialog" class="dialog-close-form"><button class="dialog-close" aria-label="Close location settings">×</button></form>
+        <h2 id="location-title">Set your location</h2>
+        <p>Use your device location or search for a city to see nearby distances.</p>
+        <button class="location-submit" id="use-location" type="button">Use my current location</button>
+        <form id="location-form" class="location-search-form">
+            <label for="city-search">City or neighborhood</label>
+            <div><input id="city-search" name="city" autocomplete="address-level2" placeholder="e.g. Brooklyn, NY"><button class="location-submit" type="submit">Search</button></div>
+        </form>
+        <p class="location-status" id="location-status" aria-live="polite"></p>
+    </dialog>
+    <script src="app.js" defer></script>
 </body>
 </html>

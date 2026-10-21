@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f6f5ef">
-    <title>Leaderboard | GoodTurn</title>
+    <title>Community | Local Volunteering</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -12,116 +12,50 @@
 </head>
 <body>
     <header class="topbar">
-        <a class="brand" href="index.html" aria-label="GoodTurn opportunities">
-            <span class="brand-mark" aria-hidden="true">g</span>
-            <span>goodturn</span>
+        <a class="brand" href="index.html" aria-label="Local Volunteering opportunities">
+            <span class="brand-mark" aria-hidden="true">L</span>
+            <span>Local Volunteering</span>
         </a>
         <nav class="main-nav" aria-label="Main navigation">
             <a class="nav-link" href="index.html">Opportunities</a>
-            <a class="nav-link active" href="leaderboard.html" aria-current="page">Leaderboards</a>
+            <a class="nav-link active" href="leaderboard.html" aria-current="page">Community</a>
             <a class="nav-link profile-link" href="profile.html">
-                <span class="avatar avatar-small" aria-hidden="true">JD</span>
+                <span class="avatar avatar-small" data-profile-initials aria-hidden="true">?</span>
                 <span>My profile</span>
             </a>
         </nav>
-        <span class="location-label"><span aria-hidden="true">⌖</span> Brooklyn, NY</span>
+        <button class="location-button" id="location-button" type="button" aria-haspopup="dialog">
+            <span aria-hidden="true">⌖</span> <span data-location-label>Brooklyn, NY</span> <span class="chevron" aria-hidden="true">⌄</span>
+        </button>
     </header>
 
-    <main class="page-main content-width leaderboard-page">
+    <main class="page-main content-width community-page">
         <div class="page-heading-row">
             <div>
-                <p class="section-kicker">GOOD TURNS ADD UP</p>
-                <h1 class="page-title">Neighborhood leaderboard<span class="heading-period">.</span></h1>
-                <p class="page-description">A little friendly motivation for doing good around Brooklyn.</p>
+                <p class="section-kicker">COMMUNITY</p>
+                <h1 class="page-title">Volunteer activity<span class="heading-period">.</span></h1>
+                <p class="page-description">Shared volunteer records and community rankings.</p>
             </div>
-            <span class="period-label">THIS MONTH</span>
         </div>
-
-        <section class="leaderboard-summary" aria-label="Leaderboard summary">
-            <div class="summary-icon" aria-hidden="true">✳</div>
-            <div><strong>100 neighbors</strong><span>showing up for their community</span></div>
-            <div class="summary-your-rank"><span>YOUR RANK</span><strong>#02 <small>of 100</small></strong></div>
-        </section>
-
-        <section class="leaderboard-section" aria-label="Volunteer rankings">
-            <div class="leaderboard-tools">
-                <div><h2>Top volunteers</h2><span id="results-count" class="results-count">Showing 1–10 of 100 volunteers</span></div>
-                <label class="search-field"><span aria-hidden="true">⌕</span><input id="volunteer-search" type="search" placeholder="Find a volunteer" aria-label="Search volunteers"></label>
-            </div>
-            <div class="leaderboard-table-header" aria-hidden="true"><span>RANK</span><span>VOLUNTEER</span><span>GOOD TURNS</span><span>POINTS</span></div>
-            <ol class="leaderboard-table" id="leaderboard-list" aria-live="polite"></ol>
-            <nav class="pagination" id="pagination" aria-label="Leaderboard pages"></nav>
+        <section class="community-empty" aria-labelledby="community-status-title">
+            <h2 id="community-status-title">Shared activity is not available yet</h2>
+            <p>Profiles and volunteer records are saved only in each visitor’s browser. A shared account and database are needed before community totals can be shown.</p>
+            <a class="hero-action" href="profile.html">Open your profile <span aria-hidden="true">→</span></a>
         </section>
     </main>
 
-    <footer class="app-footer"><span>goodturn <span aria-hidden="true">✳</span> make good happen</span><span>Made for the place we call home.</span></footer>
-
-    <script>
-        const firstNames = ['Maya', 'Alex', 'Jordan', 'Sam', 'Taylor', 'Riley', 'Casey', 'Morgan', 'Avery', 'Jamie'];
-        const lastNames = ['Chen', 'Rivera', 'Davis', 'Patel', 'Kim', 'Brooks', 'Reed', 'Lopez', 'Bennett', 'Turner'];
-        const volunteers = Array.from({ length: 100 }, (_, index) => ({
-            name: `${firstNames[index % firstNames.length]} ${lastNames[Math.floor(index / firstNames.length)]}`,
-            points: Math.max(20, 310 - index * 3),
-            goodTurns: Math.max(1, 18 - Math.floor(index / 6))
-        }));
-        volunteers[0] = { name: 'Maya Chen', points: 420, goodTurns: 24 };
-        volunteers[1] = { name: 'Jordan Davis', points: 385, goodTurns: 21, isCurrentUser: true };
-        volunteers[2] = { name: 'Alex Rivera', points: 340, goodTurns: 19 };
-
-        const pageSize = 10;
-        const list = document.querySelector('#leaderboard-list');
-        const pagination = document.querySelector('#pagination');
-        const search = document.querySelector('#volunteer-search');
-        const resultsCount = document.querySelector('#results-count');
-        let currentPage = 1;
-
-        const getFilteredVolunteers = () => volunteers.filter((volunteer) =>
-            volunteer.name.toLowerCase().includes(search.value.trim().toLowerCase())
-        );
-
-        const renderLeaderboard = () => {
-            const filteredVolunteers = getFilteredVolunteers();
-            const pageCount = Math.max(1, Math.ceil(filteredVolunteers.length / pageSize));
-            currentPage = Math.min(currentPage, pageCount);
-            const start = (currentPage - 1) * pageSize;
-            const pageVolunteers = filteredVolunteers.slice(start, start + pageSize);
-
-            list.innerHTML = pageVolunteers.map((volunteer, index) => {
-                const rank = start + index + 1;
-                const initials = volunteer.name.split(' ').map((name) => name[0]).join('');
-                return `<li class="leaderboard-person-row${volunteer.isCurrentUser ? ' current-user' : ''}"${volunteer.isCurrentUser ? ' aria-current="true"' : ''}>
-                    <span class="person-rank">${String(rank).padStart(2, '0')}</span>
-                    <span class="avatar avatar-tone-${rank % 4}" aria-hidden="true">${initials}</span>
-                    <span class="person-name">${volunteer.isCurrentUser ? 'You · ' : ''}${volunteer.name}</span>
-                    <span class="person-turns">${volunteer.goodTurns} <small>turns</small></span>
-                    <span class="person-score">${volunteer.points} <small>pts</small></span>
-                </li>`;
-            }).join('');
-
-            resultsCount.textContent = filteredVolunteers.length
-                ? `Showing ${start + 1}–${Math.min(start + pageSize, filteredVolunteers.length)} of ${filteredVolunteers.length} volunteers`
-                : 'No volunteers found';
-
-            pagination.innerHTML = pageCount > 1
-                ? `<button class="page-button page-arrow" type="button" data-page="${currentPage - 1}" aria-label="Previous page" ${currentPage === 1 ? 'disabled' : ''}>←</button>
-                    ${Array.from({ length: pageCount }, (_, index) => `<button class="page-button${index + 1 === currentPage ? ' selected' : ''}" type="button" data-page="${index + 1}" aria-label="Page ${index + 1}"${index + 1 === currentPage ? ' aria-current="page"' : ''}>${index + 1}</button>`).join('')}
-                    <button class="page-button page-arrow" type="button" data-page="${currentPage + 1}" aria-label="Next page" ${currentPage === pageCount ? 'disabled' : ''}>→</button>`
-                : '';
-        };
-
-        search.addEventListener('input', () => {
-            currentPage = 1;
-            renderLeaderboard();
-        });
-
-        pagination.addEventListener('click', (event) => {
-            const button = event.target.closest('[data-page]');
-            if (!button || button.disabled) return;
-            currentPage = Number(button.dataset.page);
-            renderLeaderboard();
-        });
-
-        renderLeaderboard();
-    </script>
+    <footer class="app-footer"><span>Local Volunteering</span><span>Opportunities and personal records for your community.</span></footer>
+    <dialog class="location-dialog" id="location-dialog" aria-labelledby="location-title">
+        <form method="dialog" class="dialog-close-form"><button class="dialog-close" aria-label="Close location settings">×</button></form>
+        <h2 id="location-title">Set your location</h2>
+        <p>Use your device location or search for a city to see nearby distances.</p>
+        <button class="location-submit" id="use-location" type="button">Use my current location</button>
+        <form id="location-form" class="location-search-form">
+            <label for="city-search">City or neighborhood</label>
+            <div><input id="city-search" name="city" autocomplete="address-level2" placeholder="e.g. Brooklyn, NY"><button class="location-submit" type="submit">Search</button></div>
+        </form>
+        <p class="location-status" id="location-status" aria-live="polite"></p>
+    </dialog>
+    <script src="app.js" defer></script>
 </body>
 </html>

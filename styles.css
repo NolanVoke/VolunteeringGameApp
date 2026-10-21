@@ -694,8 +694,11 @@ a {
 
 @media (max-width: 760px) {
     .topbar {
-        height: 66px;
-        padding: 0 20px;
+        height: auto;
+        min-height: 66px;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        padding: 8px 20px;
     }
 
     .brand {
@@ -703,6 +706,7 @@ a {
     }
 
     .main-nav {
+        height: 40px;
         gap: 18px;
     }
 
@@ -711,7 +715,9 @@ a {
     }
 
     .location-button {
-        display: none;
+        display: inline-flex;
+        min-height: 34px;
+        margin-left: auto;
     }
 
     .hero {
@@ -771,7 +777,7 @@ a {
 
 @media (max-width: 480px) {
     .topbar {
-        padding: 0 14px;
+        padding: 8px 14px;
     }
 
     .brand {
@@ -1663,5 +1669,348 @@ a {
 
     .activity-list li div span {
         font-size: 8px;
+    }
+}
+
+.profile-overview {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    padding: 22px 24px;
+    border: 1px solid #e5e8dc;
+    border-radius: 4px;
+    background: #eef2e8;
+}
+
+.profile-overview-details {
+    min-width: 0;
+}
+
+.profile-overview-details h2 {
+    overflow-wrap: anywhere;
+    margin: 0;
+    font-family: 'Manrope', sans-serif;
+    font-size: 19px;
+}
+
+.profile-overview-details p {
+    overflow-wrap: anywhere;
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.profile-overview .profile-stats-grid {
+    width: min(350px, 48%);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0 0 0 auto;
+}
+
+.profile-overview .stat-card {
+    min-height: 84px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    padding: 12px 15px;
+}
+
+.profile-overview .stat-card strong {
+    line-height: 1.1;
+}
+
+.profile-workspace {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.profile-workspace .profile-content-panel {
+    padding: 22px;
+}
+
+.form-stack {
+    display: grid;
+    gap: 9px;
+    margin-top: 18px;
+}
+
+.form-stack label,
+.location-search-form label {
+    color: #4c584d;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.form-stack input,
+.form-stack textarea,
+.location-search-form input {
+    width: 100%;
+    min-width: 0;
+    min-height: 39px;
+    padding: 8px 10px;
+    border: 1px solid #dcded5;
+    border-radius: 3px;
+    background: #fffefa;
+    color: var(--ink);
+    font: inherit;
+    font-size: 12px;
+}
+
+.form-stack textarea {
+    min-height: 76px;
+    resize: vertical;
+}
+
+.form-stack input:focus,
+.form-stack textarea:focus,
+.location-search-form input:focus {
+    border-color: #8da58d;
+    outline: 2px solid rgba(39, 96, 68, 0.12);
+}
+
+.form-stack fieldset {
+    display: grid;
+    gap: 9px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.form-stack fieldset:disabled {
+    opacity: 0.55;
+}
+
+.form-inline-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: 10px;
+}
+
+.form-inline-fields > div {
+    display: grid;
+    gap: 9px;
+    min-width: 0;
+}
+
+.form-submit {
+    width: fit-content;
+    min-height: 39px;
+    margin-top: 5px;
+    padding: 0 14px;
+    border: 0;
+    cursor: pointer;
+}
+
+.form-note,
+.form-status {
+    margin: 2px 0 0;
+    color: #737970;
+    font-size: 10px;
+}
+
+.form-status {
+    min-height: 15px;
+    color: var(--green-dark);
+}
+
+.optional-label {
+    color: #858b82;
+    font-size: 9px;
+    font-weight: 500;
+}
+
+.activity-history {
+    margin-top: 18px;
+}
+
+.activity-history .activity-list {
+    margin-top: 14px;
+}
+
+.activity-history .activity-list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 11px 2px;
+}
+
+.activity-history .activity-list li strong {
+    font-size: 12px;
+}
+
+.activity-history .activity-list li div span {
+    white-space: normal;
+    font-size: 10px;
+}
+
+.activity-hours {
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.activity-history .activity-list .activity-empty {
+    display: block;
+    padding: 15px 0 2px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.community-empty {
+    max-width: 700px;
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--white);
+}
+
+.community-empty h2 {
+    margin: 0;
+    font-family: 'Manrope', sans-serif;
+    font-size: 19px;
+}
+
+.community-empty p {
+    max-width: 590px;
+    margin: 9px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.community-empty .hero-action {
+    margin-top: 18px;
+}
+
+.location-dialog {
+    width: min(440px, calc(100% - 32px));
+    max-width: none;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: 0 18px 60px rgba(25, 37, 28, 0.2);
+}
+
+.location-dialog::backdrop {
+    background: rgba(25, 37, 28, 0.48);
+}
+
+.location-dialog h2 {
+    margin: 0;
+    font-family: 'Manrope', sans-serif;
+    font-size: 21px;
+}
+
+.location-dialog > p:not(.location-status) {
+    margin: 7px 0 18px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.dialog-close-form {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.dialog-close {
+    width: 31px;
+    height: 31px;
+    border: 0;
+    background: transparent;
+    color: #687166;
+    cursor: pointer;
+    font-size: 22px;
+}
+
+.location-submit {
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--green);
+    border-radius: 3px;
+    background: var(--green);
+    color: white;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.location-submit:hover {
+    background: var(--green-dark);
+}
+
+.location-search-form {
+    display: grid;
+    gap: 7px;
+    margin-top: 18px;
+}
+
+.location-search-form > div {
+    display: flex;
+    gap: 8px;
+}
+
+.location-search-form input {
+    flex: 1;
+}
+
+.location-status {
+    min-height: 18px;
+    margin: 12px 0 0;
+    color: var(--green-dark);
+    font-size: 11px;
+}
+
+@media (max-width: 760px) {
+    .profile-workspace {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-overview {
+        flex-wrap: wrap;
+        padding: 19px;
+    }
+
+    .profile-overview .profile-stats-grid {
+        width: 100%;
+        margin: 4px 0 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-overview {
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .profile-overview .avatar-giant {
+        width: 48px;
+        height: 48px;
+        font-size: 14px;
+    }
+
+    .profile-overview-details h2 {
+        font-size: 16px;
+    }
+
+    .profile-overview-details p {
+        font-size: 10px;
+    }
+
+    .profile-overview .stat-card {
+        min-height: 75px;
+        padding: 10px;
+    }
+
+    .profile-workspace .profile-content-panel,
+    .community-empty {
+        padding: 17px 14px;
+    }
+
+    .form-inline-fields {
+        grid-template-columns: 1fr;
     }
 }

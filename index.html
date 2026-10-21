@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f6f5ef">
-    <title>GoodTurn | Find your next good thing</title>
+    <title>Local Volunteering | Find local opportunities</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -12,20 +12,20 @@
 </head>
 <body>
     <header class="topbar">
-        <a class="brand" href="#opportunities" aria-label="GoodTurn opportunities">
-            <span class="brand-mark" aria-hidden="true">g</span>
-            <span>goodturn</span>
+        <a class="brand" href="#opportunities" aria-label="Local Volunteering opportunities">
+            <span class="brand-mark" aria-hidden="true">L</span>
+            <span>Local Volunteering</span>
         </a>
         <nav class="main-nav" aria-label="Main navigation">
             <a class="nav-link active" href="index.html" aria-current="page">Opportunities</a>
-            <a class="nav-link" href="leaderboard.html">Leaderboards</a>
+            <a class="nav-link" href="leaderboard.html">Leaderboard</a>
             <a class="nav-link profile-link" href="profile.html">
-                <span class="avatar avatar-small" aria-hidden="true">JD</span>
+                <span class="avatar avatar-small" data-profile-initials aria-hidden="true">?</span>
                 <span>My profile</span>
             </a>
         </nav>
-        <button class="location-button" type="button" aria-label="Current location: Brooklyn, New York">
-            <span aria-hidden="true">⌖</span> Brooklyn, NY <span class="chevron" aria-hidden="true">⌄</span>
+        <button class="location-button" id="location-button" type="button" aria-haspopup="dialog">
+            <span aria-hidden="true">⌖</span> <span data-location-label>Brooklyn, NY</span> <span class="chevron" aria-hidden="true">⌄</span>
         </button>
     </header>
 
@@ -34,70 +34,72 @@
             <img class="hero-image" src="vitaly-gariev-tX-A7eBc45Q-unsplash.jpg" alt="Volunteers working together outdoors" fetchpriority="high">
             <div class="hero-shade"></div>
             <div class="hero-content">
-                <p class="eyebrow"><span class="eyebrow-dot"></span> GOOD THINGS HAPPEN TOGETHER</p>
-                <h1 id="hero-title">Your neighborhood<br>could use <em>you.</em></h1>
-                <p class="hero-copy">Find a little time. Make a real difference.</p>
-                <a class="hero-action" href="#opportunities">Find your next good thing <span aria-hidden="true">↓</span></a>
+                <p class="eyebrow"><span class="eyebrow-dot"></span> VOLUNTEER IN YOUR COMMUNITY</p>
+                <h1 id="hero-title">Show up for<br>your <em>neighborhood.</em></h1>
+                <a class="hero-action" href="#opportunities">Browse opportunities <span aria-hidden="true">↓</span></a>
             </div>
-            <div class="hero-note"><span aria-hidden="true">✳</span> Small acts. Big impact.</div>
+            <div class="hero-note">Local opportunities. Real community impact.</div>
         </section>
 
         <section class="opportunities content-width" id="opportunities" aria-labelledby="opportunities-title">
             <div class="section-heading">
                 <div>
-                    <p class="section-kicker">OUT IN YOUR COMMUNITY</p>
-                    <h2 id="opportunities-title">Good things, close by<span class="heading-period">.</span></h2>
+                    <p class="section-kicker">COMMUNITY OPPORTUNITIES</p>
+                    <h2 id="opportunities-title">Volunteer near you<span class="heading-period">.</span></h2>
                 </div>
-                <span class="result-count"><span class="live-dot"></span> 3 opportunities near you</span>
+                <span class="result-count"><span class="live-dot"></span> 3 opportunities</span>
             </div>
 
             <div class="opportunity-list">
-                <article class="opportunity-card">
+                <article class="opportunity-card" data-latitude="40.6915" data-longitude="-73.9740">
                     <div class="date-tile" aria-label="Saturday, October 24"><span>OCT</span><strong>24</strong><span>SAT</span></div>
                     <div class="opportunity-details">
                         <div class="card-topline"><span class="category-tag category-green">PARKS &amp; GARDENS</span><span class="distance">0.8 mi away</span></div>
                         <h3>Help a neighborhood garden grow</h3>
                         <p class="organization">Fort Greene Green Team</p>
-                        <div class="opportunity-meta"><span><span aria-hidden="true">◷</span> 9:00 AM – 12:00 PM</span><span><span aria-hidden="true">⌖</span> Fort Greene Park</span><span class="points">✳ &nbsp;75 points</span></div>
+                        <div class="opportunity-meta"><span><span aria-hidden="true">◷</span> 9:00 AM – 12:00 PM</span><span><span aria-hidden="true">⌖</span> Fort Greene Park</span></div>
                     </div>
-                    <button class="signup-button" type="button">Sign up <span aria-hidden="true">↗</span></button>
+                    <a class="signup-button" href="https://www.google.com/search?q=Fort+Greene+Green+Team+volunteer+signup" data-organization="Fort Greene Green Team" data-event="Help a neighborhood garden grow" target="_blank" rel="noopener noreferrer">Find signup <span aria-hidden="true">↗</span></a>
                 </article>
 
-                <article class="opportunity-card">
+                <article class="opportunity-card" data-latitude="40.6964" data-longitude="-73.9672">
                     <div class="date-tile date-coral" aria-label="Sunday, October 25"><span>OCT</span><strong>25</strong><span>SUN</span></div>
                     <div class="opportunity-details">
                         <div class="card-topline"><span class="category-tag category-coral">FOOD ACCESS</span><span class="distance">1.2 mi away</span></div>
                         <h3>Pack fresh food boxes for neighbors</h3>
                         <p class="organization">Brooklyn Community Fridge</p>
-                        <div class="opportunity-meta"><span><span aria-hidden="true">◷</span> 10:30 AM – 1:00 PM</span><span><span aria-hidden="true">⌖</span> 125 Washington Ave</span><span class="points">✳ &nbsp;60 points</span></div>
+                        <div class="opportunity-meta"><span><span aria-hidden="true">◷</span> 10:30 AM – 1:00 PM</span><span><span aria-hidden="true">⌖</span> 125 Washington Ave</span></div>
                     </div>
-                    <button class="signup-button" type="button">Sign up <span aria-hidden="true">↗</span></button>
+                    <a class="signup-button" href="https://www.google.com/search?q=Brooklyn+Community+Fridge+volunteer+signup" data-organization="Brooklyn Community Fridge" data-event="Pack fresh food boxes for neighbors" target="_blank" rel="noopener noreferrer">Find signup <span aria-hidden="true">↗</span></a>
                 </article>
 
-                <article class="opportunity-card">
+                <article class="opportunity-card" data-latitude="40.7081" data-longitude="-73.9571">
                     <div class="date-tile date-yellow" aria-label="Wednesday, October 28"><span>OCT</span><strong>28</strong><span>WED</span></div>
                     <div class="opportunity-details">
                         <div class="card-topline"><span class="category-tag category-yellow">YOUTH &amp; LEARNING</span><span class="distance">2.1 mi away</span></div>
                         <h3>Be a reading buddy after school</h3>
                         <p class="organization">North Brooklyn Library</p>
-                        <div class="opportunity-meta"><span><span aria-hidden="true">◷</span> 3:30 PM – 5:00 PM</span><span><span aria-hidden="true">⌖</span> Williamsburg Library</span><span class="points">✳ &nbsp;50 points</span></div>
+                        <div class="opportunity-meta"><span><span aria-hidden="true">◷</span> 3:30 PM – 5:00 PM</span><span><span aria-hidden="true">⌖</span> Williamsburg Library</span></div>
                     </div>
-                    <button class="signup-button" type="button">Sign up <span aria-hidden="true">↗</span></button>
+                    <a class="signup-button" href="https://www.google.com/search?q=North+Brooklyn+Library+volunteer+signup" data-organization="North Brooklyn Library" data-event="Be a reading buddy after school" target="_blank" rel="noopener noreferrer">Find signup <span aria-hidden="true">↗</span></a>
                 </article>
             </div>
         </section>
 
     </main>
 
-    <footer class="app-footer"><span>goodturn <span aria-hidden="true">✳</span> make good happen</span><span>Made for the place we call home.</span></footer>
-    <script>
-        document.querySelectorAll('.signup-button').forEach((button) => {
-            button.addEventListener('click', () => {
-                button.textContent = 'You’re signed up ✓';
-                button.classList.add('signed-up');
-                button.disabled = true;
-            });
-        });
-    </script>
+    <footer class="app-footer"><span>Local Volunteering</span><span>Find volunteer opportunities in your community.</span></footer>
+    <dialog class="location-dialog" id="location-dialog" aria-labelledby="location-title">
+        <form method="dialog" class="dialog-close-form"><button class="dialog-close" aria-label="Close location settings">×</button></form>
+        <h2 id="location-title">Set your location</h2>
+        <p>Use your device location or search for a city to see nearby distances.</p>
+        <button class="location-submit" id="use-location" type="button">Use my current location</button>
+        <form id="location-form" class="location-search-form">
+            <label for="city-search">City or neighborhood</label>
+            <div><input id="city-search" name="city" autocomplete="address-level2" placeholder="e.g. Brooklyn, NY"><button class="location-submit" type="submit">Search</button></div>
+        </form>
+        <p class="location-status" id="location-status" aria-live="polite"></p>
+    </dialog>
+    <script src="app.js" defer></script>
 </body>
 </html>
