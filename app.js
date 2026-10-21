@@ -47,14 +47,19 @@ const distanceInMiles = (first, second) => {
 
 const renderDistances = (currentLocation) => {
     document.querySelectorAll('[data-latitude][data-longitude]').forEach((card) => {
+        const distanceLabel = card.querySelector('.distance');
+        if (!distanceLabel) return;
+
+        if (!currentLocation) {
+            distanceLabel.textContent = 'Set location to see distance';
+            return;
+        }
+
         const destination = {
             latitude: Number(card.dataset.latitude),
             longitude: Number(card.dataset.longitude)
         };
-        const distanceLabel = card.querySelector('.distance');
-        if (distanceLabel) {
-            distanceLabel.textContent = `${distanceInMiles(currentLocation, destination).toFixed(1)} mi away`;
-        }
+        distanceLabel.textContent = `${distanceInMiles(currentLocation, destination).toFixed(1)} mi away`;
     });
 };
 
@@ -62,15 +67,21 @@ let profile = loadValue(profileKey, null);
 let activities = loadValue(activityKey, []);
 if (!Array.isArray(activities)) activities = [];
 
-let location = loadValue(locationKey, {
-    name: 'Brooklyn, NY',
-    latitude: 40.6885,
-    longitude: -73.9762
-});
+const savedLocation = loadValue(locationKey, null);
+const isLegacyBrooklynDefault = savedLocation?.name === 'Brooklyn, NY'
+    && savedLocation.latitude === 40.6885
+    && savedLocation.longitude === -73.9762;
+let currentLocation = !isLegacyBrooklynDefault
+    && savedLocation
+    && Number.isFinite(savedLocation.latitude)
+    && Number.isFinite(savedLocation.longitude)
+    && typeof savedLocation.name === 'string'
+    ? savedLocation
+    : null;
 
 updateProfileLabels(profile);
-updateLocationLabels(location.name);
-renderDistances(location);
+updateLocationLabels(currentLocation?.name || 'Set location');
+renderDistances(currentLocation);
 
 document.querySelectorAll('.signup-button[data-organization]').forEach((link) => {
     const query = `${link.dataset.event} ${link.dataset.organization} volunteer signup`;
@@ -80,24 +91,38 @@ document.querySelectorAll('.signup-button[data-organization]').forEach((link) =>
 const locationDialog = document.querySelector('#location-dialog');
 const locationButton = document.querySelector('#location-button');
 const locationStatus = document.querySelector('#location-status');
+const useLocationButton = document.querySelector('#use-location');
 
-locationButton?.addEventListener('click', () => locationDialog?.showModal());
+locationButton?.addEventListener('click', () => {
+    if (!locationDialog) {
+        console.error('Location dialog is missing from this page.');
+        return;
+    }
+
+    locationDialog.showModal();
+});
 
 const setLocation = (nextLocation) => {
-    location = nextLocation;
-    saveValue(locationKey, location);
-    updateLocationLabels(location.name);
-    renderDistances(location);
-    if (locationStatus) locationStatus.textContent = `Showing opportunities near ${location.name}.`;
-    locationDialog?.close();
+    currentLocation = nextLocation;
+    updateLocationLabels(currentLocation.name);
+    renderDistances(currentLocation);
+    const saved = saveValue(locationKey, currentLocation);
+    if (locationStatus) {
+        locationStatus.textContent = saved
+            ? `Showing opportunities near ${currentLocation.name}.`
+            : `Showing opportunities near ${currentLocation.name}, but this location could not be saved in this browser.`;
+    }
+    if (saved) locationDialog?.close();
+    return saved;
 };
 
-document.querySelector('#use-location')?.addEventListener('click', () => {
+useLocationButton?.addEventListener('click', () => {
     if (!navigator.geolocation) {
         locationStatus.textContent = 'Location is unavailable in this browser. Search for a city instead.';
         return;
     }
 
+    useLocationButton.disabled = true;
     locationStatus.textContent = 'Getting your location…';
     navigator.geolocation.getCurrentPosition(async (position) => {
         const coordinates = {
@@ -106,22 +131,43 @@ document.querySelector('#use-location')?.addEventListener('click', () => {
         };
         try {
             const params = new URLSearchParams({
-                latitude: coordinates.latitude,
-                longitude: coordinates.longitude,
-                language: 'en',
-                format: 'json'
+                lat: coordinates.latitude,
+                lon: coordinates.longitude,
+                zoom: '10',
+                addressdetails: '1',
+                format: 'jsonv2'
             });
-            const response = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?${params}`);
-            if (!response.ok) throw new Error('Reverse geocoding failed');
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${params}`, {
+                headers: { Accept: 'application/json' }
+            });
+            if (!response.ok) throw new Error(`Reverse geocoding failed with status ${response.status}.`);
             const result = await response.json();
-            const name = result.name ? `${result.name}${result.admin1 ? `, ${result.admin1}` : ''}` : 'Current location';
+            const address = result.address || {};
+            const locality = address.city || address.town || address.village
+                || address.municipality || address.suburb || address.county;
+            const region = address['ISO3166-2-lvl4']?.split('-').pop() || address.state;
+            const name = [locality, region]
+                .filter((part, index, parts) => part && parts.indexOf(part) === index)
+                .join(', ')
+                || `${coordinates.latitude.toFixed(4)}, ${coordinates.longitude.toFixed(4)}`;
             setLocation({ ...coordinates, name });
-        } catch {
-            setLocation({ ...coordinates, name: 'Current location' });
+        } catch (error) {
+            const name = `${coordinates.latitude.toFixed(4)}, ${coordinates.longitude.toFixed(4)}`;
+            const saved = setLocation({ ...coordinates, name });
+            locationStatus.textContent = `Using your exact location for distances; the place name lookup failed. Showing coordinates: ${name}.${saved ? '' : ' The location could not be saved in this browser.'}`;
+            console.error('Could not look up the current location name:', error);
+        } finally {
+            useLocationButton.disabled = false;
         }
-    }, () => {
-        locationStatus.textContent = 'Could not access your location. Search for a city instead.';
-    }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+    }, (error) => {
+        const messages = {
+            1: 'Location permission was denied. Allow access in your browser settings or search for a city instead.',
+            2: 'Your location is unavailable right now. Try again or search for a city.',
+            3: 'The location request timed out. Try again or search for a city.'
+        };
+        locationStatus.textContent = messages[error.code] || 'Could not access your location. Search for a city instead.';
+        useLocationButton.disabled = false;
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 });
 
 document.querySelector('#location-form')?.addEventListener('submit', async (event) => {
