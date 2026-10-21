@@ -24,7 +24,11 @@
                 <span>My profile</span>
             </a>
         </nav>
-        <span class="location-label"><span aria-hidden="true">⌖</span> Brooklyn, NY</span>
+        <button class="location-button" type="button" data-location-button aria-describedby="location-privacy" title="Your coordinates are shared with OpenStreetMap to find your place name.">
+            <span aria-hidden="true">⌖</span> <span data-location-text>Set location</span> <span class="chevron" aria-hidden="true">⌄</span>
+        </button>
+        <span class="visually-hidden" id="location-privacy">Choose this button to request your location. Your coordinates are sent to OpenStreetMap to look up your place name.</span>
+        <span class="visually-hidden" data-location-status role="status" aria-live="polite"></span>
     </header>
 
     <main class="page-main content-width leaderboard-page">
@@ -56,6 +60,7 @@
 
     <footer class="app-footer"><span>goodturn <span aria-hidden="true">✳</span> make good happen</span><span>Made for the place we call home.</span></footer>
 
+    <script src="location.js"></script>
     <script>
         const firstNames = ['Maya', 'Alex', 'Jordan', 'Sam', 'Taylor', 'Riley', 'Casey', 'Morgan', 'Avery', 'Jamie'];
         const lastNames = ['Chen', 'Rivera', 'Davis', 'Patel', 'Kim', 'Brooks', 'Reed', 'Lopez', 'Bennett', 'Turner'];
