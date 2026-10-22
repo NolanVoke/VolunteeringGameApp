@@ -1674,13 +1674,21 @@ a {
 }
 
 .profile-overview {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
     align-items: center;
     gap: 17px;
     padding: 22px 24px;
     border: 1px solid #e5e8dc;
     border-radius: 4px;
     background: #eef2e8;
+}
+
+.profile-identity {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 17px;
 }
 
 .profile-overview-details {
@@ -1694,6 +1702,21 @@ a {
     font-size: 19px;
 }
 
+.profile-level-badge {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 4px 7px;
+    border-radius: 3px;
+    background: var(--green);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
 .profile-overview-details p {
     overflow-wrap: anywhere;
     margin: 3px 0 0;
@@ -1702,10 +1725,10 @@ a {
 }
 
 .profile-overview .profile-stats-grid {
-    width: min(350px, 48%);
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
-    margin: 0 0 0 auto;
+    margin: 0;
 }
 
 .profile-overview .stat-card {
@@ -1717,6 +1740,36 @@ a {
 
 .profile-overview .stat-card strong {
     line-height: 1.1;
+}
+
+.profile-level-progress {
+    grid-column: 1 / -1;
+}
+
+.profile-level-progress-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+    color: #596856;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.profile-level-progress-track {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 5px;
+    background: #d8e1d1;
+}
+
+.profile-level-progress-track span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--green);
+    transition: width 180ms ease;
 }
 
 .profile-workspace {
@@ -1976,13 +2029,17 @@ a {
     }
 
     .profile-overview {
-        flex-wrap: wrap;
+        grid-template-columns: minmax(0, 1fr);
         padding: 19px;
     }
 
     .profile-overview .profile-stats-grid {
         width: 100%;
         margin: 4px 0 0;
+    }
+
+    .profile-level-progress {
+        grid-column: 1;
     }
 }
 
@@ -2004,6 +2061,10 @@ a {
 
     .profile-overview-details p {
         font-size: 10px;
+    }
+
+    .profile-level-progress-label {
+        font-size: 9px;
     }
 
     .profile-overview .stat-card {

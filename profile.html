@@ -39,14 +39,26 @@
         </div>
 
         <section class="profile-overview" aria-labelledby="profile-name">
-            <span class="avatar avatar-giant avatar-peach" data-profile-initials aria-hidden="true">?</span>
-            <div class="profile-overview-details">
-                <h2 id="profile-name">No profile yet</h2>
-                <p id="profile-email">Create a profile on this browser</p>
+            <div class="profile-identity">
+                <span class="avatar avatar-giant avatar-peach" data-profile-initials aria-hidden="true">?</span>
+                <div class="profile-overview-details">
+                    <h2><span id="profile-name">No profile yet</span> <span class="profile-level-badge" id="profile-level">Level 0</span></h2>
+                    <p id="profile-email">Create a profile on this browser</p>
+                </div>
             </div>
             <div class="profile-stats-grid" aria-label="Your recorded volunteer activity">
                 <article class="stat-card"><strong><span id="hours-total">0</span></strong><span>HOURS RECORDED</span></article>
                 <article class="stat-card"><strong><span id="activity-total">0</span></strong><span>ACTIVITIES</span></article>
+                <article class="stat-card"><strong><span id="experience-total">0</span></strong><span>EXPERIENCE POINTS</span></article>
+            </div>
+            <div class="profile-level-progress">
+                <div class="profile-level-progress-label">
+                    <span id="level-progress-label">0 / 100 XP to Level 1</span>
+                    <span id="level-progress-percent">0%</span>
+                </div>
+                <div class="profile-level-progress-track" id="level-progress-track" role="progressbar" aria-label="Progress toward next level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <span id="level-progress-fill"></span>
+                </div>
             </div>
         </section>
 
@@ -80,6 +92,7 @@
                             <div><label for="activity-hours">Hours</label><input id="activity-hours" name="hours" type="number" min="0.1" max="24" step="0.1" required></div>
                             <div><label for="activity-date">Date</label><input id="activity-date" name="date" type="date" required></div>
                         </div>
+                        <p class="form-note">Earn 10 XP per minute of volunteer time (600 XP per hour).</p>
                         <label for="activity-notes">Notes <span class="optional-label">Optional</span></label>
                         <textarea id="activity-notes" name="notes" rows="3" maxlength="400"></textarea>
                         <button class="location-submit form-submit" type="submit">Save activity</button>

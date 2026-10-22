@@ -22,6 +22,21 @@ const saveValue = (key, value) => {
 
 const initialsFor = (name) => name.trim().split(/\s+/).slice(0, 2).map((part) => part[0].toUpperCase()).join('');
 const formatHours = (hours) => Number(hours.toFixed(1)).toString();
+const experienceForHours = (hours) => Math.round(Number(hours || 0) * 600);
+
+const levelProgressForExperience = (experience) => {
+    let level = 0;
+    let experienceInLevel = experience;
+    let experienceNeeded = 100;
+
+    while (experienceInLevel >= experienceNeeded) {
+        experienceInLevel -= experienceNeeded;
+        level += 1;
+        experienceNeeded = (level + 1) * (200 * ((level + 1)/10));
+    }
+
+    return { level, experienceInLevel, experienceNeeded };
+};
 
 const updateProfileLabels = (currentProfile) => {
     document.querySelectorAll('[data-profile-initials]').forEach((avatar) => {
@@ -254,7 +269,7 @@ document.querySelector('#activity-form')?.addEventListener('submit', (event) => 
     renderProfile(profile, activities);
     form.reset();
     form.elements.date.value = new Date().toISOString().slice(0, 10);
-    status.textContent = 'Volunteer activity recorded on this browser.';
+    status.textContent = `Volunteer activity recorded on this browser. You earned ${experienceForHours(entry.hours)} XP.`;
 });
 
 function renderProfile(currentProfile, currentActivities) {
@@ -267,8 +282,18 @@ function renderProfile(currentProfile, currentActivities) {
     document.querySelector('#profile-email').textContent = currentProfile?.email || 'Create a profile on this browser';
 
     const totalHours = currentActivities.reduce((total, activity) => total + Number(activity.hours || 0), 0);
+    const totalExperience = currentActivities.reduce((total, activity) => total + experienceForHours(activity.hours), 0);
+    const levelProgress = levelProgressForExperience(totalExperience);
     document.querySelector('#hours-total').textContent = formatHours(totalHours);
     document.querySelector('#activity-total').textContent = currentActivities.length;
+    document.querySelector('#experience-total').textContent = totalExperience.toLocaleString();
+    document.querySelector('#profile-level').textContent = `Level ${levelProgress.level}`;
+    document.querySelector('#level-progress-label').textContent = `${levelProgress.experienceInLevel.toLocaleString()} / ${levelProgress.experienceNeeded.toLocaleString()} XP to Level ${levelProgress.level + 1}`;
+    const progressPercent = Math.floor(levelProgress.experienceInLevel / levelProgress.experienceNeeded * 100);
+    document.querySelector('#level-progress-percent').textContent = `${progressPercent}%`;
+    const progressTrack = document.querySelector('#level-progress-track');
+    progressTrack.setAttribute('aria-valuenow', progressPercent);
+    document.querySelector('#level-progress-fill').style.width = `${progressPercent}%`;
     document.querySelector('#activity-count-label').textContent = `${currentActivities.length} ${currentActivities.length === 1 ? 'activity' : 'activities'}`;
 
     const activityList = document.querySelector('#activity-list');
