@@ -1,5 +1,6 @@
 const profileKey = 'volunteer-local-profile';
 const activityKey = 'volunteer-local-activities';
+const reviewRequestsKey = 'volunteer-local-review-requests';
 const locationKey = 'volunteer-local-location';
 
 const loadValue = (key, fallback) => {
@@ -81,6 +82,8 @@ const renderDistances = (currentLocation) => {
 let profile = loadValue(profileKey, null);
 let activities = loadValue(activityKey, []);
 if (!Array.isArray(activities)) activities = [];
+let reviewRequests = loadValue(reviewRequestsKey, []);
+if (!Array.isArray(reviewRequests)) reviewRequests = [];
 
 const savedLocation = loadValue(locationKey, null);
 const isLegacyBrooklynDefault = savedLocation?.name === 'Brooklyn, NY'
@@ -232,12 +235,12 @@ document.querySelector('#profile-form')?.addEventListener('submit', (event) => {
     }
 
     profile = nextProfile;
-    renderProfile(profile, activities);
+    renderProfile(profile, activities, reviewRequests);
     updateProfileLabels(profile);
     status.textContent = 'Profile saved on this browser.';
 });
 
-document.querySelector('#activity-form')?.addEventListener('submit', (event) => {
+document.querySelector('#activity-form')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
     const status = document.querySelector('#activity-status');
@@ -245,9 +248,7 @@ document.querySelector('#activity-form')?.addEventListener('submit', (event) => 
         status.textContent = 'Create your profile before recording volunteer work.';
         return;
     }
-
     const entry = {
-        id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
         title: form.elements.title.value.trim(),
         organization: form.elements.organization.value.trim(),
         hours: Number(form.elements.hours.value),
@@ -259,20 +260,92 @@ document.querySelector('#activity-form')?.addEventListener('submit', (event) => 
         return;
     }
 
-    const nextActivities = [entry, ...activities];
-    if (!saveValue(activityKey, nextActivities)) {
-        status.textContent = 'Could not save this activity in the browser. Check its storage settings.';
-        return;
-    }
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    status.textContent = 'Sending this activity for approval…';
+    try {
+        const response = await fetch('/api/activities', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...entry, name: profile.name, email: profile.email })
+        });
+        const result = await response.json().catch(() => null);
+        if (!response.ok || !result) {
+            throw new Error(result?.error || 'Could not submit this activity for approval.');
+        }
 
-    activities = nextActivities;
-    renderProfile(profile, activities);
-    form.reset();
-    form.elements.date.value = new Date().toISOString().slice(0, 10);
-    status.textContent = `Volunteer activity recorded on this browser. You earned ${experienceForHours(entry.hours)} XP.`;
+        const nextRequests = [{
+            ...entry,
+            id: result.id,
+            token: result.token,
+            status: 'pending'
+        }, ...reviewRequests];
+        if (!saveValue(reviewRequestsKey, nextRequests)) {
+            status.textContent = `Activity sent for approval (reference ${result.id}), but this browser could not save its review status.`;
+            return;
+        }
+
+        reviewRequests = nextRequests;
+        renderProfile(profile, activities, reviewRequests);
+        form.reset();
+        form.elements.date.value = new Date().toISOString().slice(0, 10);
+        status.textContent = 'Activity sent to nolan@vokey.org for approval. It will be saved and award XP only if approved.';
+    } catch (error) {
+        status.textContent = error.message;
+        console.error('Could not submit activity for approval:', error);
+    } finally {
+        submitButton.disabled = false;
+    }
 });
 
-function renderProfile(currentProfile, currentActivities) {
+async function checkActivityReviews() {
+    const pendingRequests = reviewRequests.filter((request) => request.status === 'pending');
+    if (!pendingRequests.length) return;
+
+    const status = document.querySelector('#activity-status');
+    let updated = false;
+    for (const request of pendingRequests) {
+        try {
+            const response = await fetch('/api/activities/status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: request.id, token: request.token })
+            });
+            const result = await response.json().catch(() => null);
+            if (!response.ok || !result) {
+                throw new Error(result?.error || 'Could not check activity review status.');
+            }
+
+            if (result.status === 'approved') {
+                const nextActivities = activities.some((activity) => activity.id === result.activity.id)
+                    ? activities
+                    : [result.activity, ...activities];
+                if (nextActivities !== activities && !saveValue(activityKey, nextActivities)) {
+                    throw new Error('The approved activity could not be saved in this browser. Review status will be checked again.');
+                }
+                activities = nextActivities;
+            }
+
+            if (result.status === 'approved' || result.status === 'rejected') {
+                request.status = result.status;
+                updated = true;
+                status.textContent = result.status === 'approved'
+                    ? `“${request.title}” was approved and added to your activity record.`
+                    : `“${request.title}” was not approved and will not count toward XP.`;
+            }
+        } catch (error) {
+            status.textContent = error.message;
+            console.error(`Could not check review status for activity ${request.id}:`, error);
+        }
+    }
+
+    if (updated && !saveValue(reviewRequestsKey, reviewRequests)) {
+        status.textContent = 'Review decisions were received, but could not be saved in this browser. They will be checked again.';
+    }
+    renderProfile(profile, activities, reviewRequests);
+}
+
+function renderProfile(currentProfile, currentActivities, currentReviewRequests) {
     const profileForm = document.querySelector('#profile-form');
     if (!profileForm) return;
 
@@ -307,6 +380,20 @@ function renderProfile(currentProfile, currentActivities) {
         }).join('')
         : '<li class="activity-empty">No activities recorded yet.</li>';
 
+    const reviewRequestsList = document.querySelector('#review-requests-list');
+    const visibleRequests = currentReviewRequests.filter((request) => request.status !== 'approved');
+    reviewRequestsList.innerHTML = visibleRequests.length
+        ? visibleRequests.map((request) => {
+            const detail = [request.organization, request.date].filter(Boolean).map(escapeHtml).join(' · ');
+            const label = request.status === 'rejected' ? 'Not approved' : 'Pending approval';
+            const statusClass = request.status === 'rejected' ? 'review-request-status rejected' : 'review-request-status';
+            return `<li class="activity-item">
+                <div><strong>${escapeHtml(request.title)}</strong><span>${detail}</span></div>
+                <span class="${statusClass}">${label}</span>
+            </li>`;
+        }).join('')
+        : '<li class="activity-empty">No submissions awaiting review.</li>';
+
     const activityFields = document.querySelector('#activity-fields');
     if (activityFields) activityFields.disabled = !currentProfile;
 }
@@ -324,5 +411,8 @@ function escapeHtml(value) {
 if (document.querySelector('#profile-form')) {
     const activityForm = document.querySelector('#activity-form');
     activityForm.elements.date.value = new Date().toISOString().slice(0, 10);
-    renderProfile(profile, activities);
+    renderProfile(profile, activities, reviewRequests);
+    checkActivityReviews();
+    window.addEventListener('focus', checkActivityReviews);
+    window.setInterval(checkActivityReviews, 30000);
 }

@@ -1905,6 +1905,23 @@ a {
     white-space: nowrap;
 }
 
+.review-requests-heading {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+}
+
+.review-request-status {
+    color: #8a6b2e;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.review-request-status.rejected {
+    color: #a24e3b;
+}
+
 .activity-history .activity-list .activity-empty {
     display: block;
     padding: 15px 0 2px;
@@ -1924,6 +1941,35 @@ a {
     margin: 0;
     font-family: 'Manrope', sans-serif;
     font-size: 19px;
+}
+
+.review-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.review-reject-button {
+    min-height: 39px;
+    padding: 0 14px;
+    border: 1px solid #d9c7c1;
+    border-radius: 3px;
+    background: #fffefa;
+    color: #8f493a;
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.review-reject-button:hover {
+    background: #f8eeea;
+}
+
+.review-actions button:disabled {
+    cursor: wait;
+    opacity: 0.65;
 }
 
 .community-empty p {

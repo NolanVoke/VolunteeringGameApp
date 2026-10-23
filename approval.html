@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <meta name="theme-color" content="#f6f5ef">
+    <title>Review volunteer activity | Local Volunteering</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html" aria-label="Local Volunteering opportunities">
+            <span class="brand-mark" aria-hidden="true">L</span>
+            <span>Local Volunteering</span>
+        </a>
+    </header>
+    <main class="page-main content-width">
+        <div class="page-heading-row">
+            <div>
+                <p class="section-kicker">ACTIVITY REVIEW</p>
+                <h1 class="page-title">Review volunteer activity<span class="heading-period">.</span></h1>
+                <p class="page-description">Approving adds this activity to the volunteer’s saved records and XP.</p>
+            </div>
+        </div>
+        <section class="community-empty" aria-labelledby="review-title">
+            <h2 id="review-title">Choose a review decision</h2>
+            <p id="review-description">Use the details in the review email, then approve or reject this submission.</p>
+            <div class="review-actions">
+                <button class="location-submit" id="approve-activity" type="button">Approve activity</button>
+                <button class="review-reject-button" id="reject-activity" type="button">Reject activity</button>
+            </div>
+            <p class="form-status" id="review-status" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+    <footer class="app-footer"><span>Local Volunteering</span><span>Activity review</span></footer>
+    <script src="approval.js" defer></script>
+</body>
+</html>
