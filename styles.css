@@ -1876,6 +1876,23 @@ a {
     color: var(--green-dark);
 }
 
+.account-mode-toggle {
+    width: fit-content;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: var(--green);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: left;
+}
+
+[hidden] {
+    display: none !important;
+}
+
 .optional-label {
     color: #858b82;
     font-size: 9px;

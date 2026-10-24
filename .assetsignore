@@ -8,6 +8,7 @@
 .dev.vars.*
 functions/
 schema.sql
+account-schema.sql
 wrangler.toml
 worker.js
 APPROVAL_SETUP.md

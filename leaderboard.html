@@ -34,28 +34,24 @@
             <div>
                 <p class="section-kicker">COMMUNITY</p>
                 <h1 class="page-title">Volunteer activity<span class="heading-period">.</span></h1>
-                <p class="page-description">Shared volunteer records and community rankings.</p>
+                <p class="page-description">Rankings are based on approved volunteer hours saved to member accounts.</p>
             </div>
         </div>
-        <section class="leaderboard-summary" aria-label="Community activity summary">
-            <div class="summary-icon" aria-hidden="true">✦</div>
-            <div><strong><span id="community-hours">0</span> hours</strong><span>from approved volunteer activities</span></div>
-            <div class="summary-your-rank">
-                <span>COMMUNITY</span>
-                <strong id="community-volunteers">0</strong>
-                <small><span id="community-activity-count">0</span> approved activities</small>
-            </div>
+        <section class="leaderboard-summary" aria-label="Community volunteer totals">
+            <span class="summary-icon" aria-hidden="true">✳</span>
+            <div><strong><span id="leaderboard-hours">0</span> approved hours</strong><span>Shared community contribution</span></div>
+            <div class="summary-your-rank"><span>MEMBERS</span><strong id="leaderboard-volunteers">0</strong></div>
         </section>
         <section class="leaderboard-section" aria-labelledby="leaderboard-title">
             <div class="leaderboard-tools">
-                <div><h2 id="leaderboard-title">Top volunteers</h2><span class="results-count" id="leaderboard-count">Loading…</span></div>
-                <button class="location-submit" id="leaderboard-refresh" type="button">Refresh</button>
+                <div><h2 id="leaderboard-title">Top volunteers</h2><span class="results-count" id="leaderboard-count">Loading volunteers</span></div>
+                <a class="hero-action" href="profile.html">Join the community <span aria-hidden="true">→</span></a>
             </div>
+            <p class="form-status" id="leaderboard-status" role="status" aria-live="polite">Loading leaderboard…</p>
             <div class="leaderboard-table-header" aria-hidden="true">
                 <span>RANK</span><span>VOLUNTEER</span><span>HOURS</span><span>ACTIVITIES</span>
             </div>
-            <ol class="leaderboard-table" id="leaderboard-list" aria-label="Volunteers ranked by approved hours"></ol>
-            <p class="form-status" id="leaderboard-status" role="status" aria-live="polite"></p>
+            <ol class="leaderboard-table" id="leaderboard-list" aria-live="polite"></ol>
         </section>
     </main>
 

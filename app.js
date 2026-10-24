@@ -1,6 +1,3 @@
-const profileKey = 'volunteer-local-profile';
-const activityKey = 'volunteer-local-activities';
-const reviewRequestsKey = 'volunteer-local-review-requests';
 const locationKey = 'volunteer-local-location';
 
 const loadValue = (key, fallback) => {
@@ -79,11 +76,10 @@ const renderDistances = (currentLocation) => {
     });
 };
 
-let profile = loadValue(profileKey, null);
-let activities = loadValue(activityKey, []);
-if (!Array.isArray(activities)) activities = [];
-let reviewRequests = loadValue(reviewRequestsKey, []);
-if (!Array.isArray(reviewRequests)) reviewRequests = [];
+let profile = null;
+let activities = [];
+let submissions = [];
+let accountMode = 'register';
 
 const savedLocation = loadValue(locationKey, null);
 const isLegacyBrooklynDefault = savedLocation?.name === 'Brooklyn, NY'
@@ -216,28 +212,113 @@ document.querySelector('#location-form')?.addEventListener('submit', async (even
     }
 });
 
-document.querySelector('#profile-form')?.addEventListener('submit', (event) => {
+const setAccountMode = (mode) => {
+    accountMode = mode;
+    const form = document.querySelector('#profile-form');
+    if (!form) return;
+    const nameLabel = document.querySelector('#profile-name-label');
+    const nameInput = form.elements.name;
+    const passwordInput = form.elements.password;
+    const isLogin = mode === 'login';
+    nameLabel.hidden = isLogin;
+    nameInput.hidden = isLogin;
+    nameInput.required = !isLogin;
+    passwordInput.autocomplete = isLogin ? 'current-password' : 'new-password';
+    document.querySelector('#account-submit').textContent = isLogin ? 'Sign in' : 'Create account';
+    document.querySelector('#account-mode-toggle').textContent = isLogin
+        ? 'Need an account? Create one'
+        : 'Already have an account? Sign in';
+}
+
+async function loadAccount() {
+    const response = await fetch('/api/account');
+    const result = await response.json().catch(() => null);
+    if (response.status === 401) {
+        profile = null;
+        activities = [];
+        submissions = [];
+        renderProfile(profile, activities, submissions);
+        updateProfileLabels(profile);
+        return false;
+    }
+    if (!response.ok || !result) {
+        throw new Error(result?.error || 'Could not load your account.');
+    }
+    profile = result.account;
+    activities = result.activities;
+    submissions = result.submissions;
+    renderProfile(profile, activities, submissions);
+    updateProfileLabels(profile);
+    return true;
+}
+
+document.querySelector('#account-mode-toggle')?.addEventListener('click', () => {
+    setAccountMode(accountMode === 'register' ? 'login' : 'register');
+    document.querySelector('#profile-status').textContent = '';
+});
+
+document.querySelector('#profile-form')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    const nextProfile = {
-        name: form.elements.name.value.trim(),
-        email: form.elements.email.value.trim()
-    };
     const status = document.querySelector('#profile-status');
+    const submitButton = document.querySelector('#account-submit');
+    const body = {
+        email: form.elements.email.value.trim(),
+        password: form.elements.password.value
+    };
+    if (accountMode === 'register') body.name = form.elements.name.value.trim();
 
-    if (!nextProfile.name || !nextProfile.email) {
-        status.textContent = 'Enter your name and email to create a profile.';
-        return;
-    }
-    if (!saveValue(profileKey, nextProfile)) {
-        status.textContent = 'Could not save your profile in this browser. Check its storage settings.';
-        return;
-    }
+    submitButton.disabled = true;
+    try {
+        const response = await fetch(`/api/auth/${accountMode}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const result = await response.json().catch(() => null);
+        if (!response.ok || !result) {
+            throw new Error(result?.error || 'Could not save your account.');
+        }
 
-    profile = nextProfile;
-    renderProfile(profile, activities, reviewRequests);
-    updateProfileLabels(profile);
-    status.textContent = 'Profile saved on this browser.';
+        if (accountMode === 'register') {
+            form.reset();
+            setAccountMode('login');
+            status.textContent = 'Account created. Check your email for a verification link before signing in.';
+            return;
+        }
+
+        await loadAccount();
+        form.reset();
+        status.textContent = 'You are signed in. Your approved activities are synced to your account.';
+    } catch (error) {
+        status.textContent = error.message;
+        console.error('Could not save account:', error);
+    } finally {
+        submitButton.disabled = false;
+    }
+});
+
+document.querySelector('#account-logout')?.addEventListener('click', async () => {
+    const status = document.querySelector('#profile-status');
+    const button = document.querySelector('#account-logout');
+    button.disabled = true;
+    try {
+        const response = await fetch('/api/auth/logout', { method: 'POST' });
+        const result = await response.json().catch(() => null);
+        if (!response.ok || !result) throw new Error(result?.error || 'Could not sign out.');
+        profile = null;
+        activities = [];
+        submissions = [];
+        setAccountMode('login');
+        renderProfile(profile, activities, submissions);
+        updateProfileLabels(profile);
+        status.textContent = 'You are signed out.';
+    } catch (error) {
+        status.textContent = error.message;
+        console.error('Could not sign out:', error);
+    } finally {
+        button.disabled = false;
+    }
 });
 
 document.querySelector('#activity-form')?.addEventListener('submit', async (event) => {
@@ -245,7 +326,7 @@ document.querySelector('#activity-form')?.addEventListener('submit', async (even
     const form = event.currentTarget;
     const status = document.querySelector('#activity-status');
     if (!profile) {
-        status.textContent = 'Create your profile before recording volunteer work.';
+        status.textContent = 'Sign in or create an account before recording volunteer work.';
         return;
     }
     const entry = {
@@ -267,29 +348,17 @@ document.querySelector('#activity-form')?.addEventListener('submit', async (even
         const response = await fetch('/api/activities', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...entry, name: profile.name, email: profile.email })
+            body: JSON.stringify(entry)
         });
         const result = await response.json().catch(() => null);
         if (!response.ok || !result) {
             throw new Error(result?.error || 'Could not submit this activity for approval.');
         }
 
-        const nextRequests = [{
-            ...entry,
-            id: result.id,
-            token: result.token,
-            status: 'pending'
-        }, ...reviewRequests];
-        if (!saveValue(reviewRequestsKey, nextRequests)) {
-            status.textContent = `Activity sent for approval (reference ${result.id}), but this browser could not save its review status.`;
-            return;
-        }
-
-        reviewRequests = nextRequests;
-        renderProfile(profile, activities, reviewRequests);
+        await loadAccount();
         form.reset();
         form.elements.date.value = new Date().toISOString().slice(0, 10);
-        status.textContent = 'Activity sent to nolan@vokey.org for approval. It will be saved and award XP only if approved.';
+        status.textContent = 'Activity sent for approval. It will be saved and award XP only if approved.';
     } catch (error) {
         status.textContent = error.message;
         console.error('Could not submit activity for approval:', error);
@@ -298,61 +367,16 @@ document.querySelector('#activity-form')?.addEventListener('submit', async (even
     }
 });
 
-async function checkActivityReviews() {
-    const pendingRequests = reviewRequests.filter((request) => request.status === 'pending');
-    if (!pendingRequests.length) return;
-
-    const status = document.querySelector('#activity-status');
-    let updated = false;
-    for (const request of pendingRequests) {
-        try {
-            const response = await fetch('/api/activities/status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: request.id, token: request.token })
-            });
-            const result = await response.json().catch(() => null);
-            if (!response.ok || !result) {
-                throw new Error(result?.error || 'Could not check activity review status.');
-            }
-
-            if (result.status === 'approved') {
-                const nextActivities = activities.some((activity) => activity.id === result.activity.id)
-                    ? activities
-                    : [result.activity, ...activities];
-                if (nextActivities !== activities && !saveValue(activityKey, nextActivities)) {
-                    throw new Error('The approved activity could not be saved in this browser. Review status will be checked again.');
-                }
-                activities = nextActivities;
-            }
-
-            if (result.status === 'approved' || result.status === 'rejected') {
-                request.status = result.status;
-                updated = true;
-                status.textContent = result.status === 'approved'
-                    ? `“${request.title}” was approved and added to your activity record.`
-                    : `“${request.title}” was not approved and will not count toward XP.`;
-            }
-        } catch (error) {
-            status.textContent = error.message;
-            console.error(`Could not check review status for activity ${request.id}:`, error);
-        }
-    }
-
-    if (updated && !saveValue(reviewRequestsKey, reviewRequests)) {
-        status.textContent = 'Review decisions were received, but could not be saved in this browser. They will be checked again.';
-    }
-    renderProfile(profile, activities, reviewRequests);
-}
-
-function renderProfile(currentProfile, currentActivities, currentReviewRequests) {
+function renderProfile(currentProfile, currentActivities, currentSubmissions) {
     const profileForm = document.querySelector('#profile-form');
     if (!profileForm) return;
 
+    profileForm.hidden = Boolean(currentProfile);
+    document.querySelector('#account-logout').hidden = !currentProfile;
     profileForm.elements.name.value = currentProfile?.name || '';
     profileForm.elements.email.value = currentProfile?.email || '';
     document.querySelector('#profile-name').textContent = currentProfile?.name || 'No profile yet';
-    document.querySelector('#profile-email').textContent = currentProfile?.email || 'Create a profile on this browser';
+    document.querySelector('#profile-email').textContent = currentProfile?.email || 'Create an account to sync your records';
 
     const totalHours = currentActivities.reduce((total, activity) => total + Number(activity.hours || 0), 0);
     const totalExperience = currentActivities.reduce((total, activity) => total + experienceForHours(activity.hours), 0);
@@ -381,7 +405,7 @@ function renderProfile(currentProfile, currentActivities, currentReviewRequests)
         : '<li class="activity-empty">No activities recorded yet.</li>';
 
     const reviewRequestsList = document.querySelector('#review-requests-list');
-    const visibleRequests = currentReviewRequests.filter((request) => request.status !== 'approved');
+    const visibleRequests = currentSubmissions;
     reviewRequestsList.innerHTML = visibleRequests.length
         ? visibleRequests.map((request) => {
             const detail = [request.organization, request.date].filter(Boolean).map(escapeHtml).join(' · ');
@@ -411,8 +435,45 @@ function escapeHtml(value) {
 if (document.querySelector('#profile-form')) {
     const activityForm = document.querySelector('#activity-form');
     activityForm.elements.date.value = new Date().toISOString().slice(0, 10);
-    renderProfile(profile, activities, reviewRequests);
-    checkActivityReviews();
-    window.addEventListener('focus', checkActivityReviews);
-    window.setInterval(checkActivityReviews, 30000);
+    renderProfile(profile, activities, submissions);
+    setAccountMode('register');
+}
+
+loadAccount().catch((error) => {
+    const status = document.querySelector('#profile-status');
+    if (status) status.textContent = error.message;
+    console.error('Could not load account:', error);
+});
+window.setInterval(() => {
+    if (profile) loadAccount().catch((error) => console.error('Could not refresh account:', error));
+}, 30000);
+
+const leaderboardList = document.querySelector('#leaderboard-list');
+if (leaderboardList) {
+    const leaderboardStatus = document.querySelector('#leaderboard-status');
+    fetch('/api/leaderboard')
+        .then(async (response) => {
+            const result = await response.json().catch(() => null);
+            if (!response.ok || !result) throw new Error(result?.error || 'Could not load the leaderboard.');
+            return result;
+        })
+        .then((result) => {
+            document.querySelector('#leaderboard-hours').textContent = formatHours(Number(result.summary.totalHours));
+            document.querySelector('#leaderboard-volunteers').textContent = result.summary.volunteers;
+            document.querySelector('#leaderboard-count').textContent = `${result.entries.length} ${result.entries.length === 1 ? 'volunteer' : 'volunteers'}`;
+            leaderboardList.innerHTML = result.entries.length
+                ? result.entries.map((entry) => `<li class="leaderboard-person-row${entry.account_id === result.currentAccountId ? ' current-user' : ''}">
+                    <span class="person-rank">${entry.rank}</span>
+                    <span class="avatar avatar-small avatar-tone-${entry.rank % 2}" aria-hidden="true">${escapeHtml(initialsFor(entry.name))}</span>
+                    <span class="person-name">${escapeHtml(entry.name)}${entry.account_id === result.currentAccountId ? ' (you)' : ''}</span>
+                    <span class="person-turns">${formatHours(Number(entry.total_hours))}<small> hrs</small></span>
+                    <span class="person-score">${entry.activity_count}<small> activities</small></span>
+                </li>`).join('')
+                : '<li class="activity-empty">No approved volunteer activity yet. Be the first to contribute.</li>';
+            leaderboardStatus.textContent = '';
+        })
+        .catch((error) => {
+            leaderboardStatus.textContent = error.message;
+            console.error('Could not load leaderboard:', error);
+        });
 }

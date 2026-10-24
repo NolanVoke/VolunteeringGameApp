@@ -1,3 +1,5 @@
+import { getAccountForRequest } from './auth-helpers.js';
+
 const approverEmail = 'nolan@vokey.org';
 
 const jsonResponse = (body, status = 200) => new Response(JSON.stringify(body), {
@@ -27,6 +29,8 @@ export async function onRequestPost({ request, env }) {
         || !env.MAILJET_FROM_EMAIL || !env.SITE_URL) {
         return jsonResponse({ error: 'Activity review is not configured yet.' }, 503);
     }
+    const account = await getAccountForRequest(request, env);
+    if (!account) return jsonResponse({ error: 'Sign in before submitting volunteer activity.' }, 401);
     let siteUrl;
     try {
         siteUrl = new URL(env.SITE_URL);
@@ -48,8 +52,8 @@ export async function onRequestPost({ request, env }) {
     }
 
     const activity = {
-        name: typeof submission.name === 'string' ? submission.name.trim() : '',
-        email: typeof submission.email === 'string' ? submission.email.trim() : '',
+        name: account.name,
+        email: account.email,
         title: typeof submission.title === 'string' ? submission.title.trim() : '',
         organization: typeof submission.organization === 'string' ? submission.organization.trim() : '',
         hours: Number(submission.hours),
@@ -61,9 +65,7 @@ export async function onRequestPost({ request, env }) {
         && !Number.isNaN(parsedDate.getTime())
         && parsedDate.toISOString().slice(0, 10) === activity.date;
 
-    if (!activity.name || activity.name.length > 80
-        || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(activity.email) || activity.email.length > 254
-        || !activity.title || activity.title.length > 100
+    if (!activity.title || activity.title.length > 100
         || activity.organization.length > 100
         || !Number.isFinite(activity.hours) || activity.hours < 0.1 || activity.hours > 24
         || !dateIsValid || activity.notes.length > 400) {
@@ -79,8 +81,8 @@ export async function onRequestPost({ request, env }) {
     await env.DB.prepare(`
         INSERT INTO activity_submissions
             (id, profile_name, profile_email, title, organization, hours, activity_date, notes,
-             status, approval_token_hash, submission_token_hash, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)
+             status, approval_token_hash, submission_token_hash, created_at, account_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
     `).bind(
         id,
         activity.name,
@@ -92,7 +94,8 @@ export async function onRequestPost({ request, env }) {
         activity.notes,
         approvalTokenHash,
         submissionTokenHash,
-        new Date().toISOString()
+        new Date().toISOString(),
+        account.id
     ).run();
 
     const approvalUrl = new URL(`/approval.html?token=${encodeURIComponent(approvalToken)}`, siteUrl).href;
@@ -165,5 +168,5 @@ export async function onRequestPost({ request, env }) {
         return jsonResponse({ error: 'Could not send the activity for review. Please try again.' }, 502);
     }
 
-    return jsonResponse({ id, token: submissionToken, status: 'pending' }, 201);
+    return jsonResponse({ id, status: 'pending' }, 201);
 }
