@@ -1143,6 +1143,13 @@ a {
     color: var(--green);
 }
 
+.leaderboard-message {
+    padding: 18px 13px;
+    border-bottom: 1px solid #efeee8;
+    color: var(--muted);
+    font-size: 12px;
+}
+
 .person-turns small,
 .person-score small {
     color: #888e84;

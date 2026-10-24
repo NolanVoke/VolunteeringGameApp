@@ -20,6 +20,10 @@ This repo is configured to run as a **Worker with static assets**, using the Wor
 
 Until D1 and the email settings are configured, submissions return an error and are not saved locally or awarded XP. Review links are single-use; opening the link alone does not approve the submission.
 
+<<<<<<< HEAD
 Mailjet's free plan currently has a daily sending limit, so it should be suitable for low-volume approval notifications but may not be suitable if the app sends many emails in a short period.
 
 Profiles and approved activity records remain in the submitting browser’s local storage, as before. Activities recorded before this approval workflow was added remain in local storage and continue to count. The D1 record is the source of truth for new review decisions, but this demo does not provide user accounts or cross-device profile sync.
+=======
+Profiles and approved activity records remain in the submitting browser’s local storage, as before. Activities recorded before this approval workflow was added remain in local storage and continue to count on that browser. The Community leaderboard reads approved records from D1 and does not include older browser-only activity. The D1 record is the source of truth for new review decisions, but this demo does not provide user accounts, passwords, or cross-device profile sync. No password is collected or stored; review tokens are stored only as SHA-256 hashes.
+>>>>>>> refs/remotes/origin/Santi
