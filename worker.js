@@ -1,5 +1,5 @@
 import { onRequestPost as submitActivity } from './functions/api/activities.js';
-import { onRequestPost as submitReviewDecision } from './functions/api/approval.js';
+import { onRequestGet as getReviewSubmission, onRequestPost as submitReviewDecision } from './functions/api/approval.js';
 import { onRequestPost as checkActivityStatus } from './functions/api/activities/status.js';
 import { onRequestPost as authPost } from './functions/api/auth.js';
 import { onRequestGet as getAccount } from './functions/api/account.js';
@@ -19,6 +19,7 @@ export default {
         const routes = {
             'POST /api/activities': submitActivity,
             'POST /api/approval': submitReviewDecision,
+            'GET /api/approval': getReviewSubmission,
             'POST /api/activities/status': checkActivityStatus,
             'POST /api/auth/register': authPost,
             'POST /api/auth/login': authPost,

@@ -9,6 +9,7 @@
 functions/
 schema.sql
 account-schema.sql
+activity-evidence-schema.sql
 wrangler.toml
 worker.js
 APPROVAL_SETUP.md

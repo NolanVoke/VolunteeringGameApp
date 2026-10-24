@@ -19,8 +19,17 @@ const saveValue = (key, value) => {
 };
 
 const initialsFor = (name) => name.trim().split(/\s+/).slice(0, 2).map((part) => part[0].toUpperCase()).join('');
-const formatHours = (hours) => Number(hours.toFixed(1)).toString();
-const experienceForHours = (hours) => Math.round(Number(hours || 0) * 600);
+const formatHours = (hours) => Number(hours.toFixed(2)).toString();
+const minutesForActivity = (activity) => Number(activity.duration_minutes ?? Math.round(Number(activity.hours || 0) * 60));
+const experienceForMinutes = (minutes) => minutes * 10;
+const formatDuration = (totalMinutes) => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const parts = [];
+    if (hours) parts.push(`${hours} hr${hours === 1 ? '' : 's'}`);
+    if (minutes) parts.push(`${minutes} min`);
+    return parts.join(' ') || '0 min';
+};
 
 const levelProgressForExperience = (experience) => {
     let level = 0;
@@ -321,6 +330,58 @@ document.querySelector('#account-logout')?.addEventListener('click', async () =>
     }
 });
 
+const photoPreviews = [
+    ['beforePhoto', '#activity-before-preview'],
+    ['afterPhoto', '#activity-after-preview']
+];
+
+photoPreviews.forEach(([fieldName, previewSelector]) => {
+    const input = document.querySelector(`#activity-form [name="${fieldName}"]`);
+    const preview = document.querySelector(previewSelector);
+    let previewUrl;
+    input.addEventListener('change', () => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = input.files[0] ? URL.createObjectURL(input.files[0]) : null;
+        preview.hidden = !previewUrl;
+        if (previewUrl) preview.src = previewUrl;
+    });
+});
+
+document.querySelector('#activity-form')?.addEventListener('reset', () => {
+    photoPreviews.forEach(([, previewSelector]) => {
+        const preview = document.querySelector(previewSelector);
+        if (preview.src.startsWith('blob:')) URL.revokeObjectURL(preview.src);
+        preview.removeAttribute('src');
+        preview.hidden = true;
+    });
+});
+
+const photoAsJpeg = async (file) => {
+    if (!file || !file.type.startsWith('image/')) throw new Error('Choose a valid image for each activity photo.');
+    if (file.size > 15_000_000) throw new Error('Choose a photo smaller than 15 MB.');
+    const image = await createImageBitmap(file);
+    const scale = Math.min(1, 1280 / Math.max(image.width, image.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.width * scale));
+    canvas.height = Math.max(1, Math.round(image.height * scale));
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    image.close();
+
+    for (const quality of [0.82, 0.7, 0.58, 0.45]) {
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+        if (!blob) throw new Error('Could not process an activity photo. Try another image.');
+        if (blob.size <= 350_000) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Could not read an activity photo. Try another image.'));
+                reader.readAsDataURL(blob);
+            });
+        }
+    }
+    throw new Error('Each photo must be small enough to upload. Try a smaller image.');
+};
+
 document.querySelector('#activity-form')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -329,15 +390,27 @@ document.querySelector('#activity-form')?.addEventListener('submit', async (even
         status.textContent = 'Sign in or create an account before recording volunteer work.';
         return;
     }
+    const hours = Number(form.elements.hours.value);
+    const minutes = Number(form.elements.minutes.value);
     const entry = {
         title: form.elements.title.value.trim(),
         organization: form.elements.organization.value.trim(),
-        hours: Number(form.elements.hours.value),
+        durationMinutes: hours * 60 + minutes,
         date: form.elements.date.value,
         notes: form.elements.notes.value.trim()
     };
-    if (!entry.title || !entry.date || !Number.isFinite(entry.hours) || entry.hours <= 0 || entry.hours > 24) {
-        status.textContent = 'Enter an activity, date, and a number of hours from 0.1 to 24.';
+    if (!entry.title || !entry.date || !Number.isInteger(hours) || hours < 0 || hours > 24
+        || !Number.isInteger(minutes) || minutes < 0 || minutes > 59
+        || entry.durationMinutes <= 0 || entry.durationMinutes > 1440) {
+        status.textContent = 'Enter a duration greater than zero and no more than 24 hours.';
+        return;
+    }
+    const files = [
+        form.elements.beforePhoto.files[0],
+        form.elements.afterPhoto.files[0]
+    ];
+    if (files.some((file) => !file)) {
+        status.textContent = 'Choose both a before photo and an after photo.';
         return;
     }
 
@@ -345,6 +418,7 @@ document.querySelector('#activity-form')?.addEventListener('submit', async (even
     submitButton.disabled = true;
     status.textContent = 'Sending this activity for approval…';
     try {
+        [entry.beforePhoto, entry.afterPhoto] = await Promise.all(files.map(photoAsJpeg));
         const response = await fetch('/api/activities', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -378,8 +452,9 @@ function renderProfile(currentProfile, currentActivities, currentSubmissions) {
     document.querySelector('#profile-name').textContent = currentProfile?.name || 'No profile yet';
     document.querySelector('#profile-email').textContent = currentProfile?.email || 'Create an account to sync your records';
 
-    const totalHours = currentActivities.reduce((total, activity) => total + Number(activity.hours || 0), 0);
-    const totalExperience = currentActivities.reduce((total, activity) => total + experienceForHours(activity.hours), 0);
+    const totalMinutes = currentActivities.reduce((total, activity) => total + minutesForActivity(activity), 0);
+    const totalHours = totalMinutes / 60;
+    const totalExperience = experienceForMinutes(totalMinutes);
     const levelProgress = levelProgressForExperience(totalExperience);
     document.querySelector('#hours-total').textContent = formatHours(totalHours);
     document.querySelector('#activity-total').textContent = currentActivities.length;
@@ -399,7 +474,7 @@ function renderProfile(currentProfile, currentActivities, currentSubmissions) {
             const details = [activity.organization, activity.date, activity.notes].filter(Boolean).map(escapeHtml).join(' · ');
             return `<li class="activity-item">
                 <div><strong>${escapeHtml(activity.title)}</strong><span>${details}</span></div>
-                <span class="activity-hours">${formatHours(Number(activity.hours))} hrs</span>
+                <span class="activity-hours">${formatDuration(minutesForActivity(activity))}</span>
             </li>`;
         }).join('')
         : '<li class="activity-empty">No activities recorded yet.</li>';
@@ -408,7 +483,11 @@ function renderProfile(currentProfile, currentActivities, currentSubmissions) {
     const visibleRequests = currentSubmissions;
     reviewRequestsList.innerHTML = visibleRequests.length
         ? visibleRequests.map((request) => {
-            const detail = [request.organization, request.date].filter(Boolean).map(escapeHtml).join(' · ');
+            const detail = [
+                request.organization,
+                request.date,
+                formatDuration(Number(request.duration_minutes ?? Number(request.hours || 0) * 60))
+            ].filter(Boolean).map(escapeHtml).join(' · ');
             const label = request.status === 'rejected' ? 'Not approved' : 'Pending approval';
             const statusClass = request.status === 'rejected' ? 'review-request-status rejected' : 'review-request-status';
             return `<li class="activity-item">
@@ -466,7 +545,7 @@ if (leaderboardList) {
                     <span class="person-rank">${entry.rank}</span>
                     <span class="avatar avatar-small avatar-tone-${entry.rank % 2}" aria-hidden="true">${escapeHtml(initialsFor(entry.name))}</span>
                     <span class="person-name">${escapeHtml(entry.name)}${entry.account_id === result.currentAccountId ? ' (you)' : ''}</span>
-                    <span class="person-turns">${formatHours(Number(entry.total_hours))}<small> hrs</small></span>
+                    <span class="person-turns">${formatHours(Number(entry.total_minutes) / 60)}<small> hrs</small></span>
                     <span class="person-score">${entry.activity_count}<small> activities</small></span>
                 </li>`).join('')
                 : '<li class="activity-empty">No approved volunteer activity yet. Be the first to contribute.</li>';

@@ -51,14 +51,31 @@ export async function onRequestPost({ request, env }) {
         return jsonResponse({ error: 'Request body must be an activity object.' }, 400);
     }
 
+    const durationMinutes = Number(submission.durationMinutes);
+    const beforePhoto = typeof submission.beforePhoto === 'string' ? submission.beforePhoto : '';
+    const afterPhoto = typeof submission.afterPhoto === 'string' ? submission.afterPhoto : '';
     const activity = {
         name: account.name,
         email: account.email,
         title: typeof submission.title === 'string' ? submission.title.trim() : '',
         organization: typeof submission.organization === 'string' ? submission.organization.trim() : '',
-        hours: Number(submission.hours),
+        durationMinutes,
+        hours: durationMinutes / 60,
         date: typeof submission.date === 'string' ? submission.date : '',
-        notes: typeof submission.notes === 'string' ? submission.notes.trim() : ''
+        notes: typeof submission.notes === 'string' ? submission.notes.trim() : '',
+        beforePhoto,
+        afterPhoto
+    };
+    const isValidPhoto = (photo) => {
+        if (photo.length > 500_000 || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(photo)) return false;
+        try {
+            const firstBytes = atob(photo.slice('data:image/jpeg;base64,'.length, 'data:image/jpeg;base64,'.length + 8));
+            return firstBytes.charCodeAt(0) === 0xff
+                && firstBytes.charCodeAt(1) === 0xd8
+                && firstBytes.charCodeAt(2) === 0xff;
+        } catch {
+            return false;
+        }
     };
     const parsedDate = new Date(`${activity.date}T00:00:00Z`);
     const dateIsValid = /^\d{4}-\d{2}-\d{2}$/.test(activity.date)
@@ -67,9 +84,12 @@ export async function onRequestPost({ request, env }) {
 
     if (!activity.title || activity.title.length > 100
         || activity.organization.length > 100
-        || !Number.isFinite(activity.hours) || activity.hours < 0.1 || activity.hours > 24
+        || !Number.isInteger(activity.durationMinutes) || activity.durationMinutes < 1 || activity.durationMinutes > 1440
         || !dateIsValid || activity.notes.length > 400) {
         return jsonResponse({ error: 'Some activity details are missing or invalid.' }, 400);
+    }
+    if (!isValidPhoto(beforePhoto) || !isValidPhoto(afterPhoto)) {
+        return jsonResponse({ error: 'A valid before photo and after photo are both required. Each photo must be a JPEG under 350 KB.' }, 400);
     }
 
     const id = crypto.randomUUID();
@@ -81,8 +101,9 @@ export async function onRequestPost({ request, env }) {
     await env.DB.prepare(`
         INSERT INTO activity_submissions
             (id, profile_name, profile_email, title, organization, hours, activity_date, notes,
-             status, approval_token_hash, submission_token_hash, created_at, account_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)
+             status, approval_token_hash, submission_token_hash, created_at, account_id,
+             duration_minutes, before_photo, after_photo)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)
     `).bind(
         id,
         activity.name,
@@ -95,7 +116,10 @@ export async function onRequestPost({ request, env }) {
         approvalTokenHash,
         submissionTokenHash,
         new Date().toISOString(),
-        account.id
+        account.id,
+        activity.durationMinutes,
+        beforePhoto,
+        afterPhoto
     ).run();
 
     const approvalUrl = new URL(`/approval.html?token=${encodeURIComponent(approvalToken)}`, siteUrl).href;
@@ -107,7 +131,8 @@ export async function onRequestPost({ request, env }) {
         `Activity: ${activity.title}`,
         `Organization or location: ${activity.organization || 'Not provided'}`,
         `Date: ${activity.date}`,
-        `Time: ${activity.hours} hours`,
+        `Time: ${Math.floor(activity.durationMinutes / 60)} hours ${activity.durationMinutes % 60} minutes`,
+        'Before and after photos are available on the secure review page linked below.',
         `Notes: ${activity.notes || 'None'}`,
         '',
         'Review and approve or reject this activity:',

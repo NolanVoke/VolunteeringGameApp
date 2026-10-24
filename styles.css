@@ -1903,6 +1903,59 @@ a {
     margin-top: 18px;
 }
 
+.activity-photo-preview {
+    width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+}
+
+.review-activity-details {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 8px 16px;
+    margin: 20px 0;
+    font-size: 12px;
+}
+
+.review-activity-details dt {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.review-activity-details dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.review-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+}
+
+.review-photo-grid figure {
+    margin: 0;
+}
+
+.review-photo-grid img {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: #f6f5ef;
+}
+
+.review-photo-grid figcaption {
+    margin-top: 5px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
 .activity-history .activity-list {
     margin-top: 14px;
 }

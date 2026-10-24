@@ -28,7 +28,12 @@
         </div>
         <section class="community-empty" aria-labelledby="review-title">
             <h2 id="review-title">Choose a review decision</h2>
-            <p id="review-description">Use the details in the review email, then approve or reject this submission.</p>
+            <p id="review-description">Review the volunteer details and required before-and-after photos, then approve or reject.</p>
+            <dl class="review-activity-details" id="review-activity-details" hidden></dl>
+            <div class="review-photo-grid" id="review-photo-grid" hidden>
+                <figure><img id="review-before-photo" alt="Before volunteer activity"><figcaption>Before</figcaption></figure>
+                <figure><img id="review-after-photo" alt="After volunteer activity"><figcaption>After</figcaption></figure>
+            </div>
             <div class="review-actions">
                 <button class="location-submit" id="approve-activity" type="button">Approve activity</button>
                 <button class="review-reject-button" id="reject-activity" type="button">Reject activity</button>

@@ -7,13 +7,13 @@ export async function onRequestGet({ request, env }) {
 
     const [activityRows, submissionRows] = await Promise.all([
         env.DB.prepare(`
-            SELECT id, title, organization, hours, activity_date, notes
+            SELECT id, title, organization, hours, duration_minutes, activity_date, notes
             FROM activity_submissions
             WHERE account_id = ? AND status = 'approved'
             ORDER BY activity_date DESC, created_at DESC
         `).bind(account.id).all(),
         env.DB.prepare(`
-            SELECT id, title, organization, hours, activity_date, status
+            SELECT id, title, organization, hours, duration_minutes, activity_date, status
             FROM activity_submissions
             WHERE account_id = ? AND status != 'approved'
             ORDER BY created_at DESC
@@ -27,6 +27,7 @@ export async function onRequestGet({ request, env }) {
             title: row.title,
             organization: row.organization,
             hours: row.hours,
+            duration_minutes: row.duration_minutes,
             date: row.activity_date,
             notes: row.notes
         })),
@@ -35,6 +36,7 @@ export async function onRequestGet({ request, env }) {
             title: row.title,
             organization: row.organization,
             hours: row.hours,
+            duration_minutes: row.duration_minutes,
             date: row.activity_date,
             status: row.status
         }))

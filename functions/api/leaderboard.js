@@ -8,17 +8,18 @@ export async function onRequestGet({ request, env }) {
             getAccountForRequest(request, env),
             env.DB.prepare(`
                 WITH scores AS (
-                    SELECT account_id, SUM(hours) AS total_hours, COUNT(*) AS activity_count
+                    SELECT account_id, SUM(COALESCE(duration_minutes, ROUND(hours * 60))) AS total_minutes,
+                        COUNT(*) AS activity_count
                     FROM activity_submissions
                     WHERE status = 'approved' AND account_id IS NOT NULL
                     GROUP BY account_id
                 ),
                 ranked AS (
-                    SELECT account_id, total_hours, activity_count,
-                        RANK() OVER (ORDER BY total_hours DESC) AS rank
+                    SELECT account_id, total_minutes, activity_count,
+                        RANK() OVER (ORDER BY total_minutes DESC) AS rank
                     FROM scores
                 )
-                SELECT ranked.account_id, accounts.name, ranked.total_hours,
+                SELECT ranked.account_id, accounts.name, ranked.total_minutes,
                     ranked.activity_count, ranked.rank
                 FROM ranked
                 JOIN accounts ON accounts.id = ranked.account_id
@@ -26,7 +27,8 @@ export async function onRequestGet({ request, env }) {
                 LIMIT 100
             `).all(),
             env.DB.prepare(`
-                SELECT COALESCE(SUM(hours), 0) AS total_hours, COUNT(DISTINCT account_id) AS volunteers
+                SELECT COALESCE(SUM(COALESCE(duration_minutes, ROUND(hours * 60))), 0) AS total_minutes,
+                    COUNT(DISTINCT account_id) AS volunteers
                 FROM activity_submissions
                 WHERE status = 'approved' AND account_id IS NOT NULL
             `).first()
@@ -35,7 +37,7 @@ export async function onRequestGet({ request, env }) {
         return jsonResponse({
             entries: result.results,
             summary: {
-                totalHours: Number(summary?.total_hours || 0),
+                totalHours: Number(summary?.total_minutes || 0) / 60,
                 volunteers: Number(summary?.volunteers || 0)
             },
             currentAccountId: account?.id || null
