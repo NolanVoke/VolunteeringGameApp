@@ -20,7 +20,6 @@ This repo is configured to run as a **Worker with static assets**, using the Wor
 
 Account creation emails a 24-hour verification link through Mailjet. Passwords are PBKDF2-hashed in the Worker, and sessions use secure, HTTP-only cookies. Until D1 and the email settings are configured, account creation and activity submissions return an error. Review links are single-use; opening the link alone does not approve the submission.
 
-<<<<<<< HEAD
 Mailjet's free plan currently has a daily sending limit, so it should be suitable for low-volume approval notifications but may not be suitable if the app sends many emails in a short period.
 
 Profiles, approved activity records, XP, and leaderboard totals are loaded from D1 after sign-in. Only approved activities submitted while signed in are linked to an account and included in the shared leaderboard. Older browser-only activities and old approval records are not automatically claimed or imported into an account.
