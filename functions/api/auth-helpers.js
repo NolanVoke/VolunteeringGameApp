@@ -18,7 +18,7 @@ export const originError = (request) => {
     return null;
 };
 
-const randomToken = () => {
+export const randomToken = () => {
     const bytes = crypto.getRandomValues(new Uint8Array(32));
     return btoa(String.fromCharCode(...bytes))
         .replaceAll('+', '-')
