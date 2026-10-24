@@ -73,8 +73,14 @@ const submitDecision = async (status) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: approvalToken, status })
         });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Could not save this review decision.');
+        const responseText = await response.text();
+        let result;
+        try {
+            result = JSON.parse(responseText);
+        } catch {
+            throw new Error(`The review service returned an unexpected response (HTTP ${response.status}). Please try again or check the Worker deployment.`);
+        }
+        if (!response.ok) throw new Error(result.error || `Could not save this review decision (HTTP ${response.status}).`);
         reviewStatus.textContent = status === 'approved'
             ? 'Activity approved. It can now be saved and count toward XP.'
             : 'Activity rejected. It will not be saved or count toward XP.';

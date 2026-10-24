@@ -56,24 +56,35 @@ export async function onRequestPost({ request, env }) {
         return jsonResponse({ error: 'A valid review decision is required.' }, 400);
     }
 
-    const tokenHash = await hashToken(decision.token);
-    const update = await env.DB.prepare(`
-        UPDATE activity_submissions
-        SET status = ?, reviewed_at = ?
-        WHERE approval_token_hash = ? AND status = 'pending'
-            AND (? = 'rejected' OR (before_photo IS NOT NULL AND after_photo IS NOT NULL))
-    `).bind(decision.status, new Date().toISOString(), tokenHash).run();
+    try {
+        const tokenHash = await hashToken(decision.token);
+        const update = decision.status === 'approved'
+            ? await env.DB.prepare(`
+                UPDATE activity_submissions
+                SET status = 'approved', reviewed_at = ?
+                WHERE approval_token_hash = ? AND status = 'pending'
+                    AND before_photo IS NOT NULL AND after_photo IS NOT NULL
+            `).bind(new Date().toISOString(), tokenHash).run()
+            : await env.DB.prepare(`
+                UPDATE activity_submissions
+                SET status = 'rejected', reviewed_at = ?
+                WHERE approval_token_hash = ? AND status = 'pending'
+            `).bind(new Date().toISOString(), tokenHash).run();
 
-    if (update.meta.changes === 1) return jsonResponse({ status: decision.status });
+        if (update.meta.changes === 1) return jsonResponse({ status: decision.status });
 
-    const existing = await env.DB.prepare(`
-        SELECT status, before_photo, after_photo
-        FROM activity_submissions WHERE approval_token_hash = ?
-    `).bind(tokenHash).first();
-    if (!existing) return jsonResponse({ error: 'Review link is invalid.' }, 404);
-    if (existing.status === 'pending' && decision.status === 'approved'
-        && (!existing.before_photo || !existing.after_photo)) {
-        return jsonResponse({ error: 'This submission cannot be approved because it has no before-and-after photos.' }, 409);
+        const existing = await env.DB.prepare(`
+            SELECT status, before_photo, after_photo
+            FROM activity_submissions WHERE approval_token_hash = ?
+        `).bind(tokenHash).first();
+        if (!existing) return jsonResponse({ error: 'Review link is invalid.' }, 404);
+        if (existing.status === 'pending' && decision.status === 'approved'
+            && (!existing.before_photo || !existing.after_photo)) {
+            return jsonResponse({ error: 'This submission cannot be approved because it has no before-and-after photos.' }, 409);
+        }
+        return jsonResponse({ error: `This activity was already ${existing.status}.` }, 409);
+    } catch (error) {
+        console.error('Could not save activity review decision:', error);
+        return jsonResponse({ error: 'Could not save this review decision. Please try again or check the Worker logs.' }, 500);
     }
-    return jsonResponse({ error: `This activity was already ${existing.status}.` }, 409);
 }
