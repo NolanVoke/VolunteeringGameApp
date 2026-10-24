@@ -1,4 +1,5 @@
 const locationKey = 'volunteer-local-location';
+const profileIconNameKey = 'volunteer-profile-icon-name';
 
 const loadValue = (key, fallback) => {
     try {
@@ -102,7 +103,8 @@ let currentLocation = !isLegacyBrooklynDefault
     ? savedLocation
     : null;
 
-updateProfileLabels(profile);
+const savedProfileIconName = loadValue(profileIconNameKey, null);
+updateProfileLabels(typeof savedProfileIconName === 'string' ? { name: savedProfileIconName } : null);
 updateLocationLabels(currentLocation?.name || 'Set location');
 renderDistances(currentLocation);
 
@@ -246,6 +248,7 @@ async function loadAccount() {
         profile = null;
         activities = [];
         submissions = [];
+        saveValue(profileIconNameKey, null);
         renderProfile(profile, activities, submissions);
         updateProfileLabels(profile);
         return false;
@@ -256,6 +259,9 @@ async function loadAccount() {
     profile = result.account;
     activities = result.activities;
     submissions = result.submissions;
+    if (!saveValue(profileIconNameKey, profile.name)) {
+        console.warn('Could not cache the profile name for the site navigation.');
+    }
     renderProfile(profile, activities, submissions);
     updateProfileLabels(profile);
     return true;
@@ -318,6 +324,7 @@ document.querySelector('#account-logout')?.addEventListener('click', async () =>
         profile = null;
         activities = [];
         submissions = [];
+        saveValue(profileIconNameKey, null);
         setAccountMode('login');
         renderProfile(profile, activities, submissions);
         updateProfileLabels(profile);
