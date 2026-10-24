@@ -342,26 +342,29 @@ const photoPreviews = [
     ['afterPhoto', '#activity-after-preview']
 ];
 
-photoPreviews.forEach(([fieldName, previewSelector]) => {
-    const input = document.querySelector(`#activity-form [name="${fieldName}"]`);
-    const preview = document.querySelector(previewSelector);
-    let previewUrl;
-    input.addEventListener('change', () => {
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = input.files[0] ? URL.createObjectURL(input.files[0]) : null;
-        preview.hidden = !previewUrl;
-        if (previewUrl) preview.src = previewUrl;
-    });
-});
-
-document.querySelector('#activity-form')?.addEventListener('reset', () => {
-    photoPreviews.forEach(([, previewSelector]) => {
+const activityFormForPhotos = document.querySelector('#activity-form');
+if (activityFormForPhotos) {
+    photoPreviews.forEach(([fieldName, previewSelector]) => {
+        const input = activityFormForPhotos.querySelector(`[name="${fieldName}"]`);
         const preview = document.querySelector(previewSelector);
-        if (preview.src.startsWith('blob:')) URL.revokeObjectURL(preview.src);
-        preview.removeAttribute('src');
-        preview.hidden = true;
+        let previewUrl;
+        input.addEventListener('change', () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            previewUrl = input.files[0] ? URL.createObjectURL(input.files[0]) : null;
+            preview.hidden = !previewUrl;
+            if (previewUrl) preview.src = previewUrl;
+        });
     });
-});
+
+    activityFormForPhotos.addEventListener('reset', () => {
+        photoPreviews.forEach(([, previewSelector]) => {
+            const preview = document.querySelector(previewSelector);
+            if (preview.src.startsWith('blob:')) URL.revokeObjectURL(preview.src);
+            preview.removeAttribute('src');
+            preview.hidden = true;
+        });
+    });
+}
 
 const photoAsJpeg = async (file) => {
     if (!file || !file.type.startsWith('image/')) throw new Error('Choose a valid image for each activity photo.');
