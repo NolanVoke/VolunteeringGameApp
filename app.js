@@ -470,7 +470,7 @@ function renderProfile(currentProfile, currentActivities, currentSubmissions) {
     document.querySelector('#activity-total').textContent = currentActivities.length;
     document.querySelector('#experience-total').textContent = totalExperience.toLocaleString();
     document.querySelector('#profile-level').textContent = `Level ${levelProgress.level}`;
-    document.querySelector('#level-progress-label').textContent = `${levelProgress.experienceInLevel.toLocaleString()} / ${levelProgress.experienceNeeded.toLocaleString()} XP to Level ${levelProgress.level + 1}`;
+    document.querySelector('#level-progress-label').textContent = `Level ${levelProgress.level} progress · ${levelProgress.experienceInLevel.toLocaleString()} / ${levelProgress.experienceNeeded.toLocaleString()} XP`;
     const progressPercent = Math.floor(levelProgress.experienceInLevel / levelProgress.experienceNeeded * 100);
     document.querySelector('#level-progress-percent').textContent = `${progressPercent}%`;
     const progressTrack = document.querySelector('#level-progress-track');
