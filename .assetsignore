@@ -1,0 +1,14 @@
+.git/
+.github/
+.vscode/
+.wrangler/
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+functions/
+schema.sql
+wrangler.toml
+worker.js
+APPROVAL_SETUP.md
+.assetsignore

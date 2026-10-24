@@ -1,8 +1,16 @@
-name = "volunteering-game-app"
-pages_build_output_dir = "."
+name = "volunteeringgameapp"
+main = "worker.js"
 compatibility_date = "2026-10-22"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
 
 [[d1_databases]]
 binding = "DB"
 database_name = "volunteering-activities"
 database_id = "710e9407-4196-4d90-b65c-71cfdab64c18"
+
+[vars]
+SITE_URL = "https://volunteeringgameapp.nolan-0ee.workers.dev"

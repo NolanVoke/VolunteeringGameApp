@@ -23,7 +23,8 @@ const hashToken = async (value) => {
 };
 
 export async function onRequestPost({ request, env }) {
-    if (!env.DB || !env.RESEND_API_KEY || !env.EMAIL_FROM || !env.SITE_URL) {
+    if (!env.DB || !env.MAILJET_API_KEY || !env.MAILJET_SECRET_KEY
+        || !env.MAILJET_FROM_EMAIL || !env.SITE_URL) {
         return jsonResponse({ error: 'Activity review is not configured yet.' }, 503);
     }
     let siteUrl;
@@ -112,17 +113,22 @@ export async function onRequestPost({ request, env }) {
 
     let emailResponse;
     try {
-        emailResponse = await fetch('https://api.resend.com/emails', {
+        emailResponse = await fetch('https://api.mailjet.com/v3.1/send', {
             method: 'POST',
             headers: {
-                Authorization: ['Bearer', env.RESEND_API_KEY].join(' '),
+                Authorization: `Basic ${btoa(`${env.MAILJET_API_KEY}:${env.MAILJET_SECRET_KEY}`)}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                from: env.EMAIL_FROM,
-                to: [approverEmail],
-                subject: 'Volunteer activity waiting for approval',
-                text: emailText
+                Messages: [{
+                    From: {
+                        Email: env.MAILJET_FROM_EMAIL,
+                        Name: 'Local Volunteering'
+                    },
+                    To: [{ Email: approverEmail }],
+                    Subject: 'Volunteer activity waiting for approval',
+                    TextPart: emailText
+                }]
             })
         });
     } catch (error) {
@@ -131,10 +137,31 @@ export async function onRequestPost({ request, env }) {
         return jsonResponse({ error: 'Could not send the activity for review. Please try again.' }, 502);
     }
 
-    if (!emailResponse.ok) {
-        const providerError = await emailResponse.text();
+    let emailResult;
+    try {
+        emailResult = await emailResponse.json();
+    } catch (error) {
+        await env.DB.prepare('DELETE FROM activity_submissions WHERE id = ?').bind(id).run();
+        console.error('Email provider returned an invalid response:', error);
+        return jsonResponse({ error: 'Could not send the activity for review. Please try again.' }, 502);
+    }
+
+    if (!emailResponse.ok || emailResult.Messages?.[0]?.Status !== 'success') {
+        const providerError = JSON.stringify(emailResult);
         await env.DB.prepare('DELETE FROM activity_submissions WHERE id = ?').bind(id).run();
         console.error(`Email provider rejected the review message (${emailResponse.status}):`, providerError);
+        return jsonResponse({ error: 'Could not send the activity for review. Please try again.' }, 502);
+    }
+
+    if (!emailResult.Messages?.[0]?.To?.length) {
+        await env.DB.prepare('DELETE FROM activity_submissions WHERE id = ?').bind(id).run();
+        console.error('Email provider did not confirm delivery to the reviewer.');
+        return jsonResponse({ error: 'Could not send the activity for review. Please try again.' }, 502);
+    }
+
+    if (!emailResult.Messages[0].To.some((recipient) => recipient.Email === approverEmail)) {
+        await env.DB.prepare('DELETE FROM activity_submissions WHERE id = ?').bind(id).run();
+        console.error('Email provider response did not include the expected reviewer recipient.');
         return jsonResponse({ error: 'Could not send the activity for review. Please try again.' }, 502);
     }
 
